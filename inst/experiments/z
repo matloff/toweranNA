@@ -1,0 +1,16 @@
+
+https://www.openml.org/d
+
+click CSV icon
+
+variables explained there
+
+shows how many missing!
+
+need to alter factorsToDummies() so that it does stop() if a col is all
+NA or all 1 level
+
+'sick' data
+
+
+Feynman  https://twitter.com/i/status/1081913532516569091

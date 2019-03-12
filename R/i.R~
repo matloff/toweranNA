@@ -1,0 +1,10 @@
+
+for (i in 2:(nr-1)) {
+   for (j in 2:(nc-1)) {
+      y <- c(y,a[i,j])
+      nhbrs <- 
+         c(a[i-1,j], a[i,j-1], a[i,j+1], a[i+1,j])
+      x <- rbind(x,nhbrs)
+   }
+}
+

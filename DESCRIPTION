@@ -1,0 +1,14 @@
+Package: polyanNA
+Title: toweranNA, a Novel Method for Handling Missing Values 
+Version: 0.0.0.9000
+Authors@R: c(person("Norman", "Matloff", email = "matloff@cs.ucdavis.edu", role = c("aut", "cre")),
+           person("Pete", "Mohanty", email = "pete.mohanty@gmail.com",
+           role = c("aut")))
+Description: Non-imputational method for handling missing values in a
+   prediction context.
+Depends: gtools, FNN
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+URL: https://github.com/matloff/polyanNA
+BugReports: https://github.com/matloff/polyanNA/issues
