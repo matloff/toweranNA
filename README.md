@@ -1,16 +1,8 @@
-# towerNA 
+# toweranNA 
 
-Novel, **nonimputational**  methods for handling missing values (MVs) in
+A novel, **nonimputational**  method for handling missing values (MVs) in
 **prediction** applications.
 
-## Contributions of This Package
-
-1. A novel approach specifically for prediction, based on the Tower 
-   Property of expected values, which we call the Tower Method.  
-
-2. Application of our package **polyreg** to develop an extension of 
-   the Missing-Indicator Method, which we call the Polynomial 
-   Missing-Indicator Method (pMIM).
 
 ## Overview
 
