@@ -1,5 +1,12 @@
 
-http://wordbank.stanford.edu/
+English.csv:
 
-Mirrored in accordance with permissions granted at that site.
+   http://wordbank.stanford.edu/
+
+   Mirrored in accordance with permissions granted at that site.
+
+prgeng.txt:
+
+   Data on programmer and engineer salaries in Silicon Valley, from the
+   year 2000 Census.
 
