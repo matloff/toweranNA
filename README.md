@@ -102,7 +102,7 @@ process described above.
 Our function **toweranNA()** ("tower analysis with NAs") takes this
 approach.  Usually, there will not be many data points having the exact
 value specified for U, so we average over a neighborhood of points near
-that value.  Moreover, an early paper (Matloff, 1981) showed that
+that value.  Moreover, an early paper (Matloff, 2017) showed that
 regression averaging improves estimation of means, even with no MVs. 
 
 The call form is
@@ -180,8 +180,8 @@ Data, *Proceedings of the Joint Statistical Meetings*, 2015
 M. Jones, Indicator and Stratification Methods for Missing Explanatory
 Variables in Multiple Linear Regression, *JASA*m 1996
 
-N. Matloff, Use of Regression Functions for Improved Estimation of
-Means, 1981
+N. Matloff, Statistical Regression and Classification: from Linear
+Models to Machine Learning, 2017, CRC Press
 
 O.S. Miettinen, *Theoretical Epidemiology:
 Principles of Occurrence Research in Medicine*, 1985
