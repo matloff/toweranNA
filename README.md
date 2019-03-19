@@ -1,13 +1,14 @@
 # toweranNA 
 
 A novel, **nonimputational**  method for handling missing values (MVs) in
-**prediction** applications.
+**prediction applications.** 
 
+*Norm Matloff and Pete Mohanty*
 
 ## Overview
 
-The intended class of applications is predictive modeling, rather than
-estimation.  Predictive methods of any type can be used with our Tower
+**The intended class of applications is predictive modeling, rather than
+estimation.**  Predictive methods of any type can be used with our Tower
 Method, including both linear/generalized linear models and
 nonparametric/ML methods. 
 
@@ -16,29 +17,14 @@ realms, concerns estimation of some relationship,  say estimation of
 regression coefficients and the like.  By constrast, our emphasis here
 is on **prediction**, especially relevant in this era of Big Data.  The main
 contribution of this package is a novel technique that we call the Tower
-Method, which is directly aimed at prediction. It is nonimputational.  
-
-Note that one important point about distinguishing between the
-estimation and prediction cases concerns assumptions.  Most MV methods
-(including ours) make strong assumptions, which are difficult or
-impossible to verify.  We posit that the prediction context is more
-robust to assumptions than is estimation.  This would be similar to the
-non-MV setting, in which models can be rather questionable yet still
-have strong predictive power.
-
-The large difference beween the estimation and prediction goals is
-especially clear when one notes that, in predicting new cases that have
-missing values, the classic Complete Cases method (CCM) -- use only
-fully intact rows -- is useless.  Under proper assumptions, CCM can be
-used for estimation, but it can't be used for prediction of new cases
-with MVs.
+Method, which is **directly aimed at prediction**. It is nonimputational.  
 
 To make things concrete, say we are regressing Y on a vector X of length
 p.  We have data on X in a matrix A of n rows, thus of dimensions n X p.
 Some of the elements of A are missing, i.e. are NA values in the R
 language.  We are definitely including the classification case here, so
-that Y consists of 0s and 1s (two-class case), or a matrix (multiclass
-case).
+that Y consists of 0s and 1s (two-class case), or an n X k matrix of 0s
+and 1s  (k-class case).
 
 Note carefully that in describing our methods as being for regression
 applications, *we do NOT mean imputing missing values through some
@@ -67,17 +53,18 @@ function of Y on U and V, and average it over V for fixed U, we get the
 regression function of Y on U.  
 
 If V is missing but U is known, this is very useful.  Take the Census
-data above on programmer and engineer wages, with predictors age,
-education, occupation, gender and number of weeks worked. Say we need to
-predict a case in which age and gender are missing.  Then (under proper
-assumptions), our prediction might be the estimated value of the
-regression function of wage on education, occupation and weeks worked,
-i.e. the marginal regression function of wage on those variables.
+data, included in the package,  on programmer and engineer wages, with
+predictors age, education, occupation, gender and number of weeks
+worked. Say we need to predict a case in which age and gender are
+missing.  Then (under proper assumptions), our prediction might be the
+estimated value of the regression function of wage on education,
+occupation and weeks worked, i.e. the marginal regression function of
+wage on those variables.
 
 Since each new observation to be predicted will likely have a different
 pattern of which variables are missing, we would need to estimate many
-marginal regression functions, which would in many applications be
-computationally infeasible.
+(potentially 2<sup>p</sup>) marginal regression functions, which would
+in many applications be computationally infeasible.
 
 But the Tower Property provides an alternative.  It tells us that we can
 obtain the marginal regression functions from the full one.  So, we fit
@@ -102,8 +89,9 @@ process described above.
 Our function **toweranNA()** ("tower analysis with NAs") takes this
 approach.  Usually, there will not be many data points having the exact
 value specified for U, so we average over a neighborhood of points near
-that value.  Moreover, an early paper (Matloff, 2017) showed that
-regression averaging improves estimation of means, even with no MVs. 
+that value.  Moreover, an early paper (described in (Matloff, 2017))
+showed that regression averaging improves estimation of means, even with
+no MVs, thus an added bonus. 
 
 The call form is
 
@@ -114,11 +102,21 @@ toweranNA(x, fittedReg, k, newx, scaleX = TRUE)
 where the arguments are: the data frame of the "X" data in the
 training set; the vector of fitted regression function values from that
 set; the number of nearest neighbors; and the "X" data frame for the
-data to be predicted.
+data to be predicted.  The scaling argument should be set to TRUE if the
+**fittedReg** was derived with scaled X data; if so, **newx** will also
+be scaled.
 
 The number of neighbors is of course a tuning parameter chosen by the
 analyst.  Since we are averaging fitted regression estimates, which are
 by definition already smoothed, a small value of k should work well.  
+
+*Example:  Vocabulary acquisition*
+
+This data is from the Stanford University Wordbank project.  The file,
+**English.csv**;a, is included in the <strong>toweranNA</strong>
+package.
+
+
 
 *Example:*
 
@@ -166,6 +164,14 @@ by the way, that on some data sets **Amelia** or **mice** file.
 
 
 ## Assumptions
+
+Note that one important point about distinguishing between the
+estimation and prediction cases concerns assumptions.  Most MV methods
+(ours too, though to a lesser extent) make strong assumptions, which are
+difficult or impossible to verify.  We posit that the prediction context
+is more robust to assumptions than is estimation.  This would be similar
+to the non-MV setting, in which models can be rather questionable yet
+still have strong predictive power.
 
 We will not precisely define assumptions underlying the above methods
 here; roughly, they are similar to those most existing methods.
