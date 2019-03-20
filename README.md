@@ -112,42 +112,53 @@ by definition already smoothed, a small value of k should work well.
 
 *Example:  Vocabulary acquisition*
 
-This data is from the Stanford University Wordbank project.  The file,
-**English.csv**;a, is included in the <strong>toweranNA</strong>
-package.
+This data is from the Stanford University Wordbank project.  The data,
+**english**, is included in the <strong>toweranNA</strong> package.
 
+``` r
+eng <- english[,c(2,5:8,10)] 
+eng <- factorsToDummies(eng)  # since use neighbors, can't have factors
+holdidxs <- sample(1:nrow(eng),1000)
+engtrn <- eng[-holdidxs,] 
+# training on complete cases
+engtrn <- engtrn[complete.cases(engtrn),]  
+lmout <- lm(vocab ~ .,data=engtrn) 
+# let's predict the incomplete cases
+engtst <- eng[holdidxs,] 
+incomp <- !complete.cases(engtst[,-20])
+engtst <- engtst[incomp,]
+towerout <- toweranNA(engtrn,lmout$fitted.values,5,engtst[,-20],scaleX=FALSE) 
+```
 
+The predicted values for **engtst** are now in the vector **towerout**.
 
-*Example:*
+We've compared **toweranNA** on this data to the two leading MV packages
+in R, **mice** and **Amelia**.  Unfortunately, **mice** generated a
+runtime error on this data.  In 5 runs comparing **toweranNA** and
+**Amelia**, we had these results for mean absolute prediction error:
 
+```
+MAPE, Tower   MAPE, Amelia 
 
-The function **doGenExpt()** allows one to explore the behavior of the
-Tower Method on real data.  Here we again look at the Census data,
-predicting wage income from age, gender, weeks worked, education and
-occupation, artificially injecting NA values for gender in a random 20%
-of the data.  This is a nontrival NA pattern, since (a) most cases are
-men and (b) conditional on all the predictor variables, women have lower
-wages than comparable men.
-
-<pre>
-pe1 <- pe[,c(1,2,4,6,7,12:16,3)]
-naIdxs <- sample(1:nrow(pe1),round(0.2*nrow(pe1)))
-pe1$sex[naIdxs] <- NA
-doGenExpt(pe1)
-</pre>
+125.4055      131.2602 
+100.7641      100.3371
+105.0529      107.3157 
+114.0210      115.2230
+98.4792       104.0339
+```
 
 The Mean Absolute Prediction Error results over five runs with the
 imputational package **mice** with k = 5, were:
 
 
-<pre>
+```
 Tower    mice
 21508.97 22497.55
 22735.38 22144.87
 19909.03 20463.92
 25660.07 25681.66
 18237.15 18869.71
-</pre>
+```
 
 Note we are only predicting the nonintact cases here, i.e. the ones with
 one or more NAs.  In the setting here, this typically involves a few
@@ -160,7 +171,7 @@ faster**, about 0.5 seconds vs. about 13.
 
 The results with another imputational package, **Amelia** were similar,
 though **Amelia** was much faster than **mice**.  We have found,
-by the way, that on some data sets **Amelia** or **mice** file.
+by the way, that on some data sets **Amelia** also fails to run.
 
 
 ## Assumptions
