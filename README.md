@@ -61,10 +61,12 @@ estimated value of the regression function of wage on education,
 occupation and weeks worked, i.e. the marginal regression function of
 wage on those variables.
 
-Since each new observation to be predicted will likely have a different
+Since each new case to be predicted will likely have a different
 pattern of which variables are missing, we would need to estimate many
-(potentially 2<sup>p</sup>) marginal regression functions, which would
-in many applications be computationally infeasible.
+(potentially 2<sup>p</sup>) marginal regression functions. This would
+in many applications be computationally infeasible, as each marginal
+model would need to be fitted and run through diagnostic plots and the
+like.
 
 But the Tower Property provides an alternative.  It tells us that we can
 obtain the marginal regression functions from the full one.  So, we fit
@@ -89,9 +91,11 @@ process described above.
 Our function **toweranNA()** ("tower analysis with NAs") takes this
 approach.  Usually, there will not be many data points having the exact
 value specified for U, so we average over a neighborhood of points near
-that value.  Moreover, an early paper (described in (Matloff, 2017))
-showed that regression averaging improves estimation of means, even with
-no MVs, thus an added bonus. 
+that value.  
+
+Moreover, an early *Biometrika* paper by one of us (summarized in
+(Matloff, 2017, Sec. 7.5)) showed that regression averaging improves
+estimation of means, even with no MVs, thus an added bonus. 
 
 The call form is
 
@@ -99,32 +103,44 @@ The call form is
 toweranNA(x, fittedReg, k, newx, scaleX = TRUE) 
 ```
 
-where the arguments are: the data frame of the "X" data in the
-training set; the vector of fitted regression function values from that
-set; the number of nearest neighbors; and the "X" data frame for the
-data to be predicted.  The scaling argument should be set to TRUE if the
+where the arguments are: 
+
+* **x**: the data frame of the "X" data in the training set 
+
+* **fittedReg**: the vector of fitted regression function values from that
+set 
+
+* **k**, the number of nearest neighbors 
+
+* **newx**: the "X" data frame for the
+data to be predicted  
+
+The scaling argument should be set to TRUE if the
 **fittedReg** was derived with scaled X data; if so, **newx** will also
-be scaled.
+be run through R's **scale()** function.
 
 The number of neighbors is of course a tuning parameter chosen by the
 analyst.  Since we are averaging fitted regression estimates, which are
-by definition already smoothed, a small value of k should work well.  
+by definition already smoothed, a small value of **k** should work well.  
 
 *Example:  Vocabulary acquisition*
 
 This data is from the Stanford University Wordbank project.  The data,
-**english**, is included in the <strong>toweranNA</strong> package.
+**english**, is included in the <strong>toweranNA</strong> package.  To
+illustrate how fitting and prediction occur, let's split into training
+and test sets.
 
 ``` r
 eng <- english[,c(2,5:8,10)] 
 eng <- factorsToDummies(eng)  # since use neighbors, can't have factors
+# split into training, test sets
 holdidxs <- sample(1:nrow(eng),1000)
 engtrn <- eng[-holdidxs,] 
+engtst <- eng[holdidxs,] 
 # training on complete cases
 engtrn <- engtrn[complete.cases(engtrn),]  
 lmout <- lm(vocab ~ .,data=engtrn) 
 # let's predict the incomplete cases
-engtst <- eng[holdidxs,] 
 incomp <- !complete.cases(engtst[,-20])
 engtst <- engtst[incomp,]
 towerout <- toweranNA(engtrn,lmout$fitted.values,5,engtst[,-20],scaleX=FALSE) 
@@ -135,7 +151,7 @@ The predicted values for **engtst** are now in the vector **towerout**.
 We've compared **toweranNA** on this data to the two leading MV packages
 in R, **mice** and **Amelia**.  Unfortunately, **mice** generated a
 runtime error on this data.  In 5 runs comparing **toweranNA** and
-**Amelia**, we had these results for mean absolute prediction error:
+Amelia**, we had these results for mean absolute prediction error:
 
 ```
 MAPE, Tower   MAPE, Amelia 
@@ -166,12 +182,11 @@ dozen cases, so there is considerable variation from one run to the
 next.  But overall, the Tower Method did quite well, **outperforming
 mice in all cases but one**.
 
-Moreover achieving better accuracy, Tower was also **a lot
+In addition to achieving better accuracy, Tower was also **a lot
 faster**, about 0.5 seconds vs. about 13.
 
-The results with another imputational package, **Amelia** were similar,
-though **Amelia** was much faster than **mice**.  We have found,
-by the way, that on some data sets **Amelia** also fails to run.
+**Amelia** was much faster than **mice**.  We have found,
+though, that on some data sets **Amelia** also fails to run.
 
 
 ## Assumptions
@@ -188,6 +203,15 @@ We will not precisely define assumptions underlying the above methods
 here; roughly, they are similar to those most existing methods.
 However, as noted, our view is that prediction contexts are more robust to
 assumptions, as seen in the examples above.
+
+## Future Work
+
+For some datasets, there may be few, if any, complete cases.  Say p =
+10, and that while there are no complete cases, there are many cases
+with just one predictor missing.  Then it may be worth computing the 10
+marginal regression functions, and proceeding as before.  In that
+manner, we may cover most new cases to be predicted (and use another
+method for the rest).  Code to automate this will be added.
 
 ## References
 
