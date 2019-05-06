@@ -63,9 +63,9 @@ toweranNA <- function(x,fittedReg,k,newx,scaleX=TRUE)
       rwm <- matrix(rwm,nrow=1)
       if (scaleX) {
          # rw <- scale(matrix(rw, nrow=1),center=xmns[ic],scale=xsds[ic])
-         rw <- scale(rwm,center=xmns[ic],scale=xsds[ic])
+         rwm <- scale(rwm,center=xmns[ic],scale=xsds[ic])
       }
-      tmp <- FNN::get.knnx(data = x[,ic],query = rw, k = k)
+      tmp <- FNN::get.knnx(data = x[,ic],query = rwm, k = k)
       nni <- tmp$nn.index
       if (!multiclass) {
          preds[i] <- mean(fittedReg[nni])
