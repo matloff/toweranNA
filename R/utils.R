@@ -44,7 +44,7 @@ factorToDumms <- function(x,nm=NULL)
       # need to make NA all dummies corresponding to an NA
       # get name of x
       xname <- as.character(sys.call(1))[2]
-      nm <- xname
+      if (is.null(nm)) nm <- xname
       # get name of the NA column
       nacolnm <- paste0(xname,'.NA')
       # which col is it?
