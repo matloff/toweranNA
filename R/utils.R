@@ -68,7 +68,6 @@ factorToDumms <- function(x,nm=NULL)
 dfrFactorsToDumms <- function(dfr,omitLast=FALSE) 
 {
    if (!is.data.frame(dfr)) stop('dfr must be a data frame (or data.table)')
-   browser()
    toNull <- NULL
    for (i in 1:ncol(dfr)) {
       coli <- dfr[,i]
