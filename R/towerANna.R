@@ -32,8 +32,15 @@ toweranNA <- function(x,fittedReg,k,newx,scaleX=TRUE)
       stop('convert using factorsToDummies()')
    }
    allNA <- function(w) all(is.na(w))
-   if (sum(apply(newx,1,allNA) > 0)) 
-      stop('newx has a row of all NAs')
+   allna <- apply(newx,1,allNA)
+   sumAllNA <- sum(allna)
+   someAllNA <- sumAllNA > 0
+   if (someAllNA)  {
+      cat(sumAllNA,' rows of newx were all NAs\n')
+      newx <- newx[-allna,]
+   }
+   # if (sum(apply(newx,1,allNA) > 0)) 
+   #    stop('newx has a row of all NAs')
    require(FNN)
    if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
       fittedReg <- as.vector(fittedReg)
@@ -73,6 +80,11 @@ toweranNA <- function(x,fittedReg,k,newx,scaleX=TRUE)
          preds[i,] <- colMeans(fittedReg[nni,])
       }
    }
+   if (someAllNA) {   
+      altPreds <- rep(NA,length(allna))
+      altPreds[!allna] <- preds
+      preds <- altPreds
+   }
    preds
 }
 
@@ -81,7 +93,7 @@ toweranNA <- function(x,fittedReg,k,newx,scaleX=TRUE)
 # wrapper for toweranNA() in lm() case; here x is a data matrix of X, y
 # is Y; other args as in toweranNA()
 
-towerLM <- function(x,y,k,newx,scaleX=TRUE) {
+towerLM <- function(x,y,k,newx,scaleX=FALSE) {
    ccs <- complete.cases(cbind(x,y))
    cat(sum(ccs),' complete cases\n')
    xcc <- x[ccs,]
