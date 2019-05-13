@@ -37,7 +37,7 @@ toweranNA <- function(x,fittedReg,k,newx,scaleX=TRUE)
    someAllNA <- sumAllNA > 0
    if (someAllNA)  {
       cat(sumAllNA,' rows of newx were all NAs\n')
-      newx <- newx[-allna,]
+      newx <- newx[!allna,]
    }
    # if (sum(apply(newx,1,allNA) > 0)) 
    #    stop('newx has a row of all NAs')
