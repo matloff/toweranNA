@@ -7,4 +7,5 @@ export(checkConstCols)
 export(factorToDumms)
 export(dfrFactorsToDumms)
 export(towerLM)
+export(towerTS)
 

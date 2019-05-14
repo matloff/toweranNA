@@ -91,14 +91,36 @@ toweranNA <- function(x,fittedReg,k,newx,scaleX=TRUE)
 ###########################  towerLM()  ###############################
 
 # wrapper for toweranNA() in lm() case; here x is a data matrix of X, y
-# is Y; other args as in toweranNA()
+# is Y; useGLM() means glm instead of lm(); other args as in toweranNA()
 
-towerLM <- function(x,y,k,newx,scaleX=FALSE) {
+towerLM <- function(x,y,k,newx,useGLM=FALSE,scaleX=FALSE) {
    ccs <- complete.cases(cbind(x,y))
    cat(sum(ccs),' complete cases\n')
    xcc <- x[ccs,]
    ycc <- y[ccs]
-   lmout <- lm(ycc ~ xcc)
+   if (!useGLM) lmout <- lm(ycc ~ xcc) else
+      lmout <- glm(ycc ~ xcc,family=binomial)
    toweranNA(xcc,lmout$fitted.values,k,newx,scaleX)
+}
+
+
+############################  towerTS  ###############################
+
+# Tower for time series; fits linear model to lagged elements; k is the
+# number of nearest neighbors; predicts only the missing; the attribute
+# 'naIdxs' records the indices
+
+towerTS <- function(xts,lag,k) {
+   xy <- TStoX(xts,lag)
+   l1 <- lag + 1
+   x <- xy[,-l1]; y <- xy[,l1]
+   NAs.orig <- which(is.na(xts))
+   # can't predict before time lag+1
+   NAs <- NAs.orig[NAs.orig > lag]
+   # adjust for shifted indexing
+   newx <- x[NAs-lag,]
+   preds <- towerLM(x,y,k,newx,FALSE)
+   attr(preds,'naIdxs') <- NAs.orig
+   preds
 }
 
