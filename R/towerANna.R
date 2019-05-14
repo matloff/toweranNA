@@ -22,7 +22,7 @@
 
 # value: vector of predicted values
 
-toweranNA <- function(x,fittedReg,k,newx,scaleX=TRUE) 
+toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE) 
 {
    if (sum(is.na(x)) > 0)
       stop('x must be NA-free; call complete.cases()')
@@ -72,8 +72,14 @@ toweranNA <- function(x,fittedReg,k,newx,scaleX=TRUE)
          # rw <- scale(matrix(rw, nrow=1),center=xmns[ic],scale=xsds[ic])
          rwm <- scale(rwm,center=xmns[ic],scale=xsds[ic])
       }
-      tmp <- FNN::get.knnx(data = x[,ic],query = rwm, k = k)
-      nni <- tmp$nn.index
+      if (k == 1) {
+         require(pdist)
+         tmp <- pdist(rwm[1,],x[,ic])@dist
+         nni <- which.min(tmp)
+      } else {
+         tmp <- FNN::get.knnx(data = x[,ic],query = rwm, k = k)
+         nni <- tmp$nn.index
+      }
       if (!multiclass) {
          preds[i] <- mean(fittedReg[nni])
       } else {
