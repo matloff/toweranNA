@@ -127,6 +127,8 @@ towerTS <- function(xts,lag,k) {
    newx <- x[NAs-lag,]
    preds <- towerLM(x,y,k,newx,FALSE)
    attr(preds,'naIdxs') <- NAs.orig
-   preds
+   NAsSkipped <- NAs.orig[NAs.orig <= lag]
+   firstpreds <- rep(NA,length(NAsSkipped))
+   c(firstpreds,preds)
 }
 
