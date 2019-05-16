@@ -113,8 +113,9 @@ towerLM <- function(x,y,k,newx,useGLM=FALSE,scaleX=FALSE) {
 ############################  towerTS  ###############################
 
 # Tower for time series; fits linear model to lagged elements; k is the
-# number of nearest neighbors; predicts only the missing; the attribute
-# 'naIdxs' records the indices
+# number of nearest neighbors; predicts only the missing; the component
+# 'naIdxs' records the indices of the predicted elements (some will be
+# NA)
 
 towerTS <- function(xts,lag,k) {
    xy <- TStoX(xts,lag)
@@ -126,9 +127,9 @@ towerTS <- function(xts,lag,k) {
    # adjust for shifted indexing
    newx <- x[NAs-lag,]
    preds <- towerLM(x,y,k,newx,FALSE)
-   attr(preds,'naIdxs') <- NAs.orig
    NAsSkipped <- NAs.orig[NAs.orig <= lag]
    firstpreds <- rep(NA,length(NAsSkipped))
-   c(firstpreds,preds)
+   preds <- c(firstpreds,preds)
+   list(preds = preds, naIdxs = NAs.orig)
 }
 
