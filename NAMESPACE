@@ -2,9 +2,10 @@
 export(toweranNA)
 export(TStoX)
 
-export(doGenExpt)
 export(countnas)
 export(checkConstCols)
 export(factorToDumms)
 export(dfrFactorsToDumms)
+export(towerLM)
+export(towerTS)
 
