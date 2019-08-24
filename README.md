@@ -15,16 +15,16 @@ nonparametric/ML methods.
 Most of the MV literature, both in the statistics and machine learning
 realms, concerns estimation of some relationship,  say estimation of
 regression coefficients and the like.  By constrast, our emphasis here
-is on **prediction**, especially relevant in this era of Big Data.  The main
+is on **prediction**, especially relevant in our AI era.  The main
 contribution of this package is a novel technique that we call the Tower
 Method, which is **directly aimed at prediction**. It is nonimputational.  
 
-To make things concrete, say we are regressing Y on a vector X of length
-p.  We have data on X in a matrix A of n rows, thus of dimensions n X p.
-Some of the elements of A are missing, i.e. are NA values in the R
-language.  We are definitely including the classification case here, so
-that Y consists of 0s and 1s (two-class case), or an n X k matrix of 0s
-and 1s  (k-class case).
+To make things concrete, say we are regressing Y on a vector X of p
+predictors.  We have data on X in a matrix A of n rows, thus of
+dimensions n x p.  Some of the elements of A are missing, i.e. are NA
+values in the R language.  We are definitely including the
+classification case here, so that Y is a vector of 0s and 1s (two-class
+case), or an n x k matrix of 0s and 1s  (k-class case).
 
 Note carefully that in describing our methods as being for regression
 applications, *we do NOT mean imputing missing values through some
@@ -72,7 +72,8 @@ But the Tower Property provides an alternative.  It tells us that we can
 obtain the marginal regression functions from the full one.  So, we fit
 the full model to the complete cases in the data, then average that
 model over all data points whose values for education, occupation and
-weeks worked match those in the new case to be predicted.  
+weeks worked match those in the new case to be predicted.  Thus only the
+full model need be estimated, rather than 2<sup>p</sup> models.
 
 In the Tower Property above, for a new case in which education,
 occupation and weeks worked are known while age and gender are missing,
@@ -89,9 +90,9 @@ Property implies that we can obtain that estimate by the averaging
 process described above.
 
 Our function **toweranNA()** ("tower analysis with NAs") takes this
-approach.  Usually, there will not be many data points having the exact
-value specified for U, so we average over a neighborhood of points near
-that value.  
+approach.  Usually, there may not be many data points having the exact
+value specified for U, if any, so we average over a neighborhood of
+points near that value.  
 
 Moreover, an early *Biometrika* paper by one of us (summarized in
 (Matloff, 2017, Sec. 7.5)) showed that regression averaging improves
@@ -105,15 +106,18 @@ toweranNA(x, fittedReg, k, newx, scaleX = TRUE)
 
 where the arguments are: 
 
-* **x**: the data frame of the "X" data in the training set 
+* **x**: the data frame of the "X" data in the training set, used for
+  finding nearest neighbors. 
 
-* **fittedReg**: the vector of fitted regression function values from that
-set 
+* **fittedReg**: the vector of fitted regression function values
+  (parameter or nonparametric) over that set 
 
 * **k**, the number of nearest neighbors 
 
 * **newx**: the "X" data frame for the
 data to be predicted  
+
+* **sacleX**: if TRUE, scale X before performing the analysis
 
 The scaling argument should be set to TRUE if the
 **fittedReg** was derived with scaled X data; if so, **newx** will also
