@@ -1,0 +1,19 @@
+
+# inputs a time series of length m, converts to an n X p matrix, where p
+# is the lag of a presumed autoregressive model and n = m - p + 1
+
+TStoX <- function(x,lag) 
+{
+browser()
+   lx <- length(x)
+   lxl <- lx - lag + 1
+   lxl2 <- lxl + 1
+   mt <- cbind(x[-(lxl2:lx)],1:lxl)
+   onerow <- function(mtrow) {
+      i <- mtrow[2]
+      s <- i
+      e <- i + lag - 1
+      x[s:e]
+   }
+   t(apply(mt,1,onerow))
+}
