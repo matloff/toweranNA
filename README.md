@@ -149,6 +149,8 @@ incomp <- !complete.cases(engtst[,-20])
 towerout <- toweranNA(engcc,lmout$fitted.values,5,engicc[,-20],scaleX=FALSE) 
 ```
 
+The predicted values for **engicc** are now in the vector **towerout**.
+
 To assess how well the process works, let's do the following.  In
 ordinary regression analysis, R<sup>2</sup> is the squared correlation
 between predicted Y and actual Y.  Let's compute that here, pretending
@@ -159,15 +161,10 @@ our Y values are missing:
 [1] 0.6415378
 ```
 
-compute an
-R<sup>2</sup>-like number, the s
-
-The predicted values for **engtst** are now in the vector **towerout**.
-
 We've compared **toweranNA** on this data to the two leading MV packages
 in R, **mice** and **Amelia**.  Unfortunately, **mice** generated a
 runtime error on this data.  In 5 runs comparing **toweranNA** and
-Amelia**, we had these results for mean absolute prediction error:
+**Amelia**, we had these results for mean absolute prediction error:
 
 ```
 MAPE, Tower   MAPE, Amelia 
@@ -179,8 +176,9 @@ MAPE, Tower   MAPE, Amelia
 98.4792       104.0339
 ```
 
-The Mean Absolute Prediction Error results over five runs with the
-imputational package **mice** with k = 5, were:
+Also, on the **prgeng** data included in the package, we predicted wage
+income.  The Mean Absolute Prediction Error results over five runs with
+the imputational package **mice** with k = 5, were:
 
 
 ```
@@ -199,7 +197,8 @@ next.  But overall, the Tower Method did quite well, **outperforming
 mice in all cases but one**.
 
 In addition to achieving better accuracy, Tower was also **a lot
-faster**, about 0.5 seconds vs. about 13.
+faster**, than **mice** about 0.5 seconds vs. about 13.  (**Amelia** is
+comparable to our Tower Method in speed.)
 
 **Amelia** was much faster than **mice**.  We have found,
 though, that on some data sets **Amelia** also fails to run.
@@ -214,11 +213,6 @@ difficult or impossible to verify.  We posit that the prediction context
 is more robust to assumptions than is estimation.  This would be similar
 to the non-MV setting, in which models can be rather questionable yet
 still have strong predictive power.
-
-We will not precisely define assumptions underlying the above methods
-here; roughly, they are similar to those most existing methods.
-However, as noted, our view is that prediction contexts are more robust to
-assumptions, as seen in the examples above.
 
 ## Future Work
 
