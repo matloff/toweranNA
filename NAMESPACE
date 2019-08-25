@@ -4,8 +4,8 @@ export(TStoX)
 
 export(countnas)
 export(checkConstCols)
-export(factorToDumms)
-export(dfrFactorsToDumms)
+export(factorToDummies)
+export(factorsToDummies)
 export(towerLM)
 export(towerTS)
 
