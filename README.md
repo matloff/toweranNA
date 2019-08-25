@@ -130,26 +130,37 @@ by definition already smoothed, a small value of **k** should work well.
 *Example:  Vocabulary acquisition*
 
 This data is from the Stanford University Wordbank project.  The data,
-**english**, is included in the <strong>toweranNA</strong> package.  To
-illustrate how fitting and prediction occur, let's split into training
-and test sets.
+**english**, is included in the <strong>toweranNA</strong> package.  Of
+the non-administrative variables, e.g. excluding 'Language', which is
+always English in this data, about 43 percent of the values are missing.
+To illustrate how fitting and prediction occur, let's fit to the
+observations having missing values:
 
 ``` r
 data(english)
 eng <- english[,c(2,5:8,10)] 
 eng <- factorsToDummies(eng)  # since use neighbors, can't have factors
-# split into training, test sets
-holdidxs <- sample(1:nrow(eng),1000)
-engtrn <- eng[-holdidxs,] 
-engtst <- eng[holdidxs,] 
-# training on complete cases
-engtrn <- engtrn[complete.cases(engtrn),]  
-lmout <- lm(vocab ~ .,data=engtrn) 
+cc <- complete.cases(eng)
+engcc <- eng[cc,]
+engicc <- eng[!cc,]
+lmout <- lm(vocab ~ .,data=engcc) 
 # let's predict the incomplete cases
 incomp <- !complete.cases(engtst[,-20])
-engtst <- engtst[incomp,]
-towerout <- toweranNA(engtrn,lmout$fitted.values,5,engtst[,-20],scaleX=FALSE) 
+towerout <- toweranNA(engcc,lmout$fitted.values,5,engicc[,-20],scaleX=FALSE) 
 ```
+
+To assess how well the process works, let's do the following.  In
+ordinary regression analysis, R<sup>2</sup> is the squared correlation
+between predicted Y and actual Y.  Let's compute that here, pretending
+our Y values are missing:
+
+``` r
+> cor(towerout,engicc[,20])^2
+[1] 0.6415378
+```
+
+compute an
+R<sup>2</sup>-like number, the s
 
 The predicted values for **engtst** are now in the vector **towerout**.
 
