@@ -135,6 +135,7 @@ illustrate how fitting and prediction occur, let's split into training
 and test sets.
 
 ``` r
+data(english)
 eng <- english[,c(2,5:8,10)] 
 eng <- factorsToDummies(eng)  # since use neighbors, can't have factors
 # split into training, test sets
