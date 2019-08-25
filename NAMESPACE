@@ -1,10 +1,7 @@
 
 export(toweranNA)
-export(TStoX)
 export(countnas)
 export(checkConstCols)
-export(factorToDummies)
-export(factorsToDummies)
 export(towerLM)
 export(towerTS)
 

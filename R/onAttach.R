@@ -1,6 +1,6 @@
 
 .onAttach <- function(libname, pkgname) {
    packageStartupMessage(
-      'under construction')
+      'latest version in github/matloff')
 }
 
