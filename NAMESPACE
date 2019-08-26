@@ -2,6 +2,8 @@
 export(toweranNA)
 export(countnas)
 export(checkConstCols)
+export(TStoX)
+export(TStoMat)
 export(towerLM)
 export(towerTS)
 
