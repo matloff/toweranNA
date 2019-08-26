@@ -127,7 +127,7 @@ The number of neighbors is of course a tuning parameter chosen by the
 analyst.  Since we are averaging fitted regression estimates, which are
 by definition already smoothed, a small value of **k** should work well.  
 
-*Example:  Vocabulary acquisition*
+## Example:  Vocabulary acquisition
 
 This data is from the Stanford University Wordbank project.  The data,
 **english**, is included in the <strong>toweranNA</strong> package.  Of
@@ -161,9 +161,47 @@ our Y values are missing:
 [1] 0.6415378
 ```
 
+## Example:  Gold time series 
+
+Rob Hyndman's **forecast** package includes a time series **gold**,
+consisting of 1108 daily gold prices.   The series does have some NAs,
+including two in the final 10 data points:
+
+``` r
+> gold[1099:1108]
+ [1] 395.30 394.10 393.40 396.00     NA     NA 391.25 383.30 384.00 382.30
+```
+Let's predict the 1109th data point, using the Tower Method:
+
+``` r
+> gx <- TStoX(gold,10)
+> gxd <- as.data.frame(gx)
+> gxdcc <- gxd[complete.cases(gxd),]
+> lmout <- lm(V11 ~ .,data=gxd)
+> x1109 <- gold[1099:1108]
+> toweranNA(gxdcc,lmout$fitted.values,5,matrix(x1109,nrow=1))
+[1] 383.0053
+```
+
+The function **TStoX()**, which the package imports from **regtools**,
+transforms the data to an 11-column matrix, designed for analysis of lag 10.  
+In each row of **gx**, we see a value in column 11, preceded in the
+row by the 10 most recent points.  That 11th column is the original time
+series, minus the first 10 observations.  So, the call to **lm()** is
+loosely autoregressive, with each time point predicted from the previous
+10.
+
+## Wrapper functions
+
+The package includes functions **towerLM()** and **towerTS()** to wrap
+the several operations seen in the worked examples above, e.g.
+extracting the complete cases.
+
+## Comparison to other methods
+
 We've compared **toweranNA** on this data to the two leading MV packages
 in R, **mice** and **Amelia**.  Unfortunately, **mice** generated a
-runtime error on this data.  In 5 runs comparing **toweranNA** and
+runtime error on this English data.  In 5 runs comparing **toweranNA** and
 **Amelia**, we had these results for mean absolute prediction error:
 
 ```
@@ -203,6 +241,12 @@ comparable to our Tower Method in speed.)
 **Amelia** was much faster than **mice**.  We have found,
 though, that on some data sets **Amelia** also fails to run.
 
+For time series, we tried the **NH4** data in **imputeTS** package,
+using the latter's 'na.ma' method (simple moving average).  The
+resulting Mean Absolute Prediction Errors were 1.51 for **imputeTS**,
+1.37 for Tower.
+
+Of course, these investigations are just preliminary.
 
 ## Assumptions
 
