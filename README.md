@@ -3,7 +3,7 @@
 A novel, **nonimputational**  method for handling missing values (MVs) in
 **prediction applications.** 
 
-*Norm Matloff and Pete Mohanty*
+*Norm Matloff (UC Davis) and Pete Mohanty (Google)*
 
 ## Overview
 
@@ -15,9 +15,12 @@ nonparametric/ML methods.
 Most of the MV literature, both in the statistics and machine learning
 realms, concerns estimation of some relationship,  say estimation of
 regression coefficients and the like.  By constrast, our emphasis here
-is on **prediction**, especially relevant in our AI era.  The main
+is on **PREDICTION**, especially relevant in our AI era.  The main
 contribution of this package is a novel technique that we call the Tower
-Method, which is **directly aimed at prediction**. It is nonimputational.  
+Method, which is **directly aimed at prediction**. It is
+nonimputational.  (For some other nonimputational methods, though not
+motivated by prediction, see for instance (Soysal, 2018) and (Gu,
+2015).)
 
 To make things concrete, say we are regressing Y on a vector X of p
 predictors.  We have data on X in a matrix A of n rows, thus of
@@ -29,11 +32,9 @@ case), or an n x k matrix of 0s and 1s  (k-class case).
 Note carefully that in describing our methods as being for regression
 applications, *we do NOT mean imputing missing values through some
 regression technique.* Instead, our context is that of regression
-applications themselves, with the goal being prediction.  Again, all of
-our methods are **nonimputational**.  (For some other nonimputational
-methods, see for instance (Soysal, 2018) and (Gu, 2015).)
+applications themselves, with the goal being prediction.  
 
-## toweranNA(): A novel method based on regression averaging
+## toweranNA: A novel method based on regression averaging
 
 The famous formula in probability theory,
 
@@ -106,18 +107,17 @@ toweranNA(x, fittedReg, k, newx, scaleX = TRUE)
 
 where the arguments are: 
 
-* **x**: the data frame of the "X" data in the training set, used for
-  finding nearest neighbors. 
+* **x**: The data frame of the "X" data in the training set, used for
+  finding nearest neighbors.  These must be complete cases.
 
-* **fittedReg**: the vector of fitted regression function values
-  (parameter or nonparametric) over that set 
+* **fittedReg**: The vector of fitted regression function values
+  (parameter or nonparametric) over that set. 
 
-* **k**, the number of nearest neighbors 
+* **k**, The number of nearest neighbors. 
 
-* **newx**: the "X" data frame for the
-data to be predicted  
+* **newx**: The "X" data frame for the data to be predicted.  
 
-* **sacleX**: if TRUE, scale X before performing the analysis
+* **sacleX**: If TRUE, scale **newx** before performing the analysis
 
 The scaling argument should be set to TRUE if the
 **fittedReg** was derived with scaled X data; if so, **newx** will also

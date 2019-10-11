@@ -24,24 +24,24 @@
 
 toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE) 
 {
-   if (sum(is.na(x)) > 0)
+   # k-NN requires NA-free data
+   if (sum(is.na(x)) > 0)  
       stop('x must be NA-free; call complete.cases()')
-   factors <- sapply(x,is.factor)
+   # k-NN requires numerical data
+   factors <- sapply(x,is.factor)  
    if (any(factors)) {
       print('factors present in X data')
-      stop('convert using factorsToDummies()')
+      stop('convert using regtools::factorsToDummies()')
    }
+   # method cannot predict a data point consisting of all NAs
    allNA <- function(w) all(is.na(w))
    allna <- apply(newx,1,allNA)
    sumAllNA <- sum(allna)
-   someAllNA <- sumAllNA > 0
-   if (someAllNA)  {
-      cat(sumAllNA,' rows of newx were all NAs\n')
+   if (sumAllNA > 0)  {
+      warning(sumAllNA,' rows of newx were all NAs\n')
       newx <- newx[!allna,]
    }
-   # if (sum(apply(newx,1,allNA) > 0)) 
-   #    stop('newx has a row of all NAs')
-   require(FNN)
+   # multiclass Y will have fittedReg as a matrix, otherwise vector
    if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
       fittedReg <- as.vector(fittedReg)
    multiclass <- is.matrix(fittedReg)
