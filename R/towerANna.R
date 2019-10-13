@@ -8,7 +8,7 @@
 #    x: matrix/data frame of "X" values, numeric, all complete cases
 #    fittedReg: fitted regression values; see below 
 #    k: number of nearest neighbors
-#    scaleX: scale xc and newx before prediction
+#    scaleX: scale x and newx before prediction
 #    newx: matrix/data frame of new "X" values
 
 # in the case of regression or a 2-class classification problem,
@@ -19,6 +19,9 @@
 # with number of columns equal to number of classes, and number of rows
 # equal to that of 'newx'; the (i,j) element will be the estimated
 # conditional probability of that class, given row i of x
+
+# the purpose of scaling x and newx is that the k-NN ops will be better
+# if all the predictor variables are commensurate
 
 # value: vector of predicted values
 
@@ -38,8 +41,8 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
    allna <- apply(newx,1,allNA)
    sumAllNA <- sum(allna)
    if (sumAllNA > 0)  {
-      warning(sumAllNA,' rows of newx were all NAs\n')
-      newx <- newx[!allna,]
+      print('some rows of newx were all NAs\n:')
+      print(which(allnam))
    }
    # multiclass Y will have fittedReg as a matrix, otherwise vector
    if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
@@ -48,9 +51,11 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
    nc <- ncol(x)
    if (scaleX) {
       x <- scale(x,center=TRUE,scale=TRUE)
+      # retain the scaling parameters to use in newx
       xmns <- attr(x,'scaled:center')
       xsds <- attr(x,'scaled:scale')
    }
+   # set up space for the predictions
    if (!multiclass) {
        preds <- vector(length = nrow(newx))
    } else {
@@ -86,11 +91,12 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
          preds[i,] <- colMeans(fittedReg[nni,])
       }
    }
-   if (someAllNA) {   
-      altPreds <- rep(NA,length(allna))
-      altPreds[!allna] <- preds
-      preds <- altPreds
-   }
+   # decided above to just bail if have any all-NA rows
+   # if (someAllNA) {   
+   #    altPreds <- rep(NA,length(allna))
+   #    altPreds[!allna] <- preds
+   #    preds <- altPreds
+   # }
    preds
 }
 
