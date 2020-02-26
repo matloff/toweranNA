@@ -1,13 +1,16 @@
 Package: toweranNA
 Title: toweranNA, a Novel Method for Handling Missing Values 
-Version: 0.0.0.9000
-Authors@R: c(person("Norman", "Matloff", email = "matloff@cs.ucdavis.edu", role = c("aut", "cre")),
-           person("Pete", "Mohanty", email = "pete.mohanty@gmail.com",
-           role = c("aut")))
-Description: Non-imputational method for handling missing values in a
-   prediction context.
-Depends: regtools,gtools, FNN
-Imports: 
+Version: 0.0.1.00
+Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")),
+           person("Pete", "Mohanty", email = "pete.mohanty@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0001-8531-3345")))
+Description: Non-imputational method for handling missing values in a prediction context.
+Depends: R (>= 3.6.0)
+Imports: FNN, pdist, regtools, stats, polyreg
+Exports: checkConstCols, countnas, towerLM, towerTS, toweranNA
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/matloff/toweranNA
+BugReports: https://github.com/matloff/toweranNA/issues
+Maintainer: Norm Matloff <matloff@cs.ucdavis.edu>
+

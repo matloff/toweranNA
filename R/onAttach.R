@@ -1,6 +1,6 @@
 
 .onAttach <- function(libname, pkgname) {
    packageStartupMessage(
-      'latest version in github/matloff')
+      'Documentation and latest version available at github/matloff')
 }
 

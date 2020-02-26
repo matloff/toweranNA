@@ -42,7 +42,7 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
    sumAllNA <- sum(allna)
    if (sumAllNA > 0)  {
       print('some rows of newx were all NAs\n:')
-      print(which(allnam))
+      print(which(allna))
    }
    # multiclass Y will have fittedReg as a matrix, otherwise vector
    if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
@@ -78,11 +78,10 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
          rwm <- scale(rwm,center=xmns[ic],scale=xsds[ic])
       }
       if (k == 1) {
-         require(pdist)
          tmp <- pdist(rwm[1,],x[,ic])@dist
          nni <- which.min(tmp)
       } else {
-         tmp <- FNN::get.knnx(data = x[,ic],query = rwm, k = k)
+         tmp <- get.knnx(data = x[,ic],query = rwm, k = k)
          nni <- tmp$nn.index
       }
       if (!multiclass) {
