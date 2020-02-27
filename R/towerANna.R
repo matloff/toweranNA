@@ -104,14 +104,18 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
 # wrapper for toweranNA() in lm() case; here x is a data matrix of X, y
 # is Y; useGLM() means glm instead of lm(); other args as in toweranNA()
 
-towerLM <- function(x,y,k,newx,useGLM=FALSE,scaleX=FALSE) {
+towerLM <- function(x,y,k,newx,useGLM=FALSE,scaleX=FALSE,noisy=TRUE) {
+   if(scaleX) 
+      x <- scale(x) 
    ccs <- complete.cases(cbind(x,y))
-   cat(sum(ccs),' complete cases\n')
+   if(noisy) cat(sum(ccs), 'complete cases out of n =', nrow(x),'observations.\n')
    xcc <- x[ccs,]
    ycc <- y[ccs]
-   if (!useGLM) lmout <- lm(ycc ~ xcc) else
-      lmout <- glm(ycc ~ xcc,family=binomial)
-   toweranNA(xcc,lmout$fitted.values,k,newx,scaleX)
+   if(noisy) cat("fitting model...\n")
+   est <- if(useGLM) glm(ycc ~ ., data=xcc, family=binomial) else lm(ycc ~ ., data=xcc)
+   if(noisy) cat("Calling toweranNA() for", k, "nearest neighbors with", 
+                 if(useGLM) "generalized linear model" else "linear model", "estimates.")
+   toweranNA(xcc,est$fitted.values,k,newx,scaleX)
 }
 
 
