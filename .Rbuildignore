@@ -5,4 +5,5 @@ R/z
 data/
 man/TS.Rd
 man/factorsDummies.Rd
+man/preng.Rd
 inst/
