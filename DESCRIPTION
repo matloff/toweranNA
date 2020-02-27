@@ -5,7 +5,7 @@ Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu", role = 
            person("Pete", "Mohanty", email = "pete.mohanty@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0001-8531-3345")))
 Description: Non-imputational method for handling missing values in a prediction context.
 Depends: R (>= 3.6.0)
-Imports: FNN, pdist, regtools, stats, polyreg
+Imports: FNN, pdist, regtools, stats
 Exports: checkConstCols, countnas, towerLM, towerTS, toweranNA
 License: GPL (>= 2)
 Encoding: UTF-8
@@ -13,4 +13,5 @@ LazyData: true
 URL: https://github.com/matloff/toweranNA
 BugReports: https://github.com/matloff/toweranNA/issues
 Maintainer: Norm Matloff <matloff@cs.ucdavis.edu>
-
+NeedsCompilation: no
+Suggests: polyreg
