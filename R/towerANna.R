@@ -109,7 +109,7 @@ towerLM <- function(x,y,k,newx,useGLM=FALSE,scaleX=FALSE,noisy=TRUE) {
       x <- scale(x) 
    ccs <- complete.cases(cbind(x,y))
    if(noisy) cat(sum(ccs), 'complete cases out of n =', nrow(x),'observations.\n')
-   xcc <- x[ccs,]
+   xcc <- as.data.frame(x[ccs,])
    ycc <- y[ccs]
    if(noisy) cat("fitting model...\n")
    est <- if(useGLM) glm(ycc ~ ., data=xcc, family=binomial) else lm(ycc ~ ., data=xcc)

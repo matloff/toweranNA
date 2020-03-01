@@ -3,7 +3,7 @@
 \title{Wrapper for toweranNA for linear models and generalized linear models.}
 \description{Wrapper for toweranNA() in lm() case; here x is a data matrix of X, y is Y; useGLM() means glm instead of lm(); other args as in toweranNA().}
 \usage{
-towerLM(x, y, k, newx, useGLM = FALSE, scaleX = FALSE)
+towerLM(x, y, k, newx, useGLM = FALSE, scaleX = FALSE, noisy=TRUE)
 }
 \arguments{
   \item{x}{A data frame or matrix of features/predictors which may contain missing data.}
@@ -12,6 +12,7 @@ towerLM(x, y, k, newx, useGLM = FALSE, scaleX = FALSE)
   \item{newx}{matrix/data frame of new "X" values}
   \item{useGLM}{Fit generalized linear model via maximum likelihood? Default: FALSE (fit linear model via ordinary least squares). GLM currently only implemented for family="binomia."}
   \item{scaleX}{scale (standardize) x and newx before prediction? The purpose of scaling x and newx is that the k-NN ops will be better if all the predictor variables are commensurate Default: FALSE.}
+  \item{noisy}{Display updates? Default TRUE.}
 }
 \value{Returns a vector of predictions (based on newx) via toweranNA().}
 \references{
@@ -33,7 +34,8 @@ Pete Mohanty
 This function is based on a general version Tower Property: E[ E(Y|U,V) | U ] = E(Y | U). What this theoretical abstraction says is that if we take the regression function of Y on U and V, and average it over V for fixed U, we get the regression function of Y on U. If V is missing but U is known, this is very useful. 
 }
 \examples{
-# set up a toy example by introducing missingness into mtcars, specifically
+# Set up a toy example by introducing 
+# roughly 10 percent missingness into mtcars:
 set.seed(123)
 missing <- matrix(runif(prod(dim(mtcars))), ncol=ncol(mtcars)) < 0.1
 xy <- mtcars
@@ -45,9 +47,8 @@ new <- sample(c(TRUE,FALSE), size=nrow(mtcars), replace=TRUE)
 
 # mpg, the outcome used as y, is in column 1
 predicted <- towerLM(x=xy[!new, -1], y=xy$mpg[!new], newx=xy[new,-1], k=3)
-predicted
-# [1] 21.88045 24.30537 17.38092 21.79566 16.98026 21.88045 21.88045 18.06675 18.06675 14.68180 24.30537 24.30537
-# [13] 24.30537 18.06675 16.79775 24.30537 22.12398 16.53428
+head(predicted)
+# [1] 21.88045 24.30537 17.38092 21.79566 16.98026 21.88045 21.88045 
 cor(predicted, mtcars$mpg[new])
 # [1] 0.8706723
 
