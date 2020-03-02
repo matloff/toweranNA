@@ -33,6 +33,7 @@ Pete Mohanty
 set.seed(2020)
 x <- rnorm(1000)
 x <- runif(1000) * sin(x) + rnorm(1000)
+w <- x
 # introduce 5 percent missingness
 x[sample(1000, 50)] <- NA
 # make predictions with lag 3 using k=4 nearest neighbors 
@@ -45,4 +46,6 @@ out <- towerTS(x, lag=3, k=4)
 #
 # $naIdxs
 # [1]  23  54  61  82  99 140
+mean(abs(out$pred - w[out$naIdxs]))
+# 0.7709702
 }

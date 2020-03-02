@@ -33,8 +33,7 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
    # k-NN requires numerical data
    factors <- sapply(x,is.factor)  
    if (any(factors)) {
-      print('factors present in X data')
-      stop('convert using regtools::factorsToDummies()')
+      stop('Factors present in X data but numerical data are required. Convert using regtools::factorsToDummies().')
    }
    # method cannot predict a data point consisting of all NAs
    allNA <- function(w) all(is.na(w))
@@ -43,6 +42,7 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
    if (sumAllNA > 0)  {
       print('some rows of newx were all NAs\n:')
       print(which(allna))
+      stop("Drop rows which are all NA.")
    }
    # multiclass Y will have fittedReg as a matrix, otherwise vector
    if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
