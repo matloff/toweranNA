@@ -1,6 +1,6 @@
 # toweranNA 
 
-A novel, **nonimputational**  method for handling missing values (MVs) in
+A **nonimputational**  method for handling missing values (MVs) in
 **prediction applications.** 
 
 *Norm Matloff (UC Davis) and Pete Mohanty (Google)*
@@ -10,13 +10,13 @@ A novel, **nonimputational**  method for handling missing values (MVs) in
 **The intended class of applications is predictive modeling, rather than
 estimation.**  Predictive methods of any type can be used with our Tower
 Method, including both linear/generalized linear models and
-nonparametric/ML methods. 
+nonparametric/machine learning methods. 
 
 Most of the MV literature, both in the statistics and machine learning
 realms, concerns estimation of some relationship,  say estimation of
 regression coefficients and the like.  By constrast, our emphasis here
 is on **PREDICTION**, especially relevant in our AI era.  The main
-contribution of this package is a novel technique that we call the Tower
+contribution of this package is a technique that we call the Tower
 Method, which is **directly aimed at prediction**. It is
 nonimputational.  (For some other nonimputational methods, though not
 motivated by prediction, see for instance (Soysal, 2018) and (Gu,
@@ -31,10 +31,11 @@ case), or an n x k matrix of 0s and 1s  (k-class case).
 
 Note carefully that in describing our methods as being for regression
 applications, *we do NOT mean imputing missing values through some
-regression technique.* Instead, our context is that of regression
-applications themselves, with the goal being prediction.  
+regression technique*; again, our technique is non-imputational. 
+Instead, our context is that of regression applications themselves, with the 
+goal being prediction of Y.  
 
-## toweranNA: A novel method based on regression averaging
+## toweranNA: A method based on regression averaging
 
 The famous formula in probability theory,
 
