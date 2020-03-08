@@ -1,6 +1,6 @@
 Package: toweranNA
-Title: toweranNA, a Novel Method for Handling Missing Values 
-Version: 0.0.1.00
+Title: toweranNA, a Method for Handling Missing Values in Prediction Applications
+Version: 0.1.00
 Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")),
            person("Pete", "Mohanty", email = "pete.mohanty@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0001-8531-3345")))
 Description: Non-imputational method for handling missing values in a prediction context.

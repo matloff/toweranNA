@@ -5,7 +5,7 @@ A **nonimputational**  method for handling missing values (MVs) in
 
 *Norm Matloff (UC Davis) and Pete Mohanty (Google)*
 
-## Overview
+## Overview: the goal is prediction, not statistical inference
 
 **The intended class of applications is predictive modeling, rather than
 estimation.**  Predictive methods of any type can be used with our Tower
@@ -37,6 +37,28 @@ goal being prediction of Y.
 
 ## toweranNA: A method based on regression averaging
 
+### Motivating example
+
+Take the Census data, included in the package,  on programmer and
+engineer wages, with predictors Age, Education, Occupation, Gender and
+Weeks Worked. Say we need to predict a case in which age and
+gender are missing.  Then (under proper assumptions), our prediction
+might be the estimated value of the regression function of wage on
+Education, Occupation and Weeks Worked, i.e. the *marginal regression
+function* of wage on those variables.
+
+Since each new case to be predicted will likely have a different
+pattern of which variables are missing, we would need to estimate many
+(potentially 2<sup>p</sup>) marginal regression functions. This would
+in many applications be computationally infeasible, as each marginal
+model would need to be fitted and run through diagnostic plots and the
+like.
+
+**But the Tower Property provides an alternative.**  It tells us that **we can
+obtain the marginal regression functions from the full one.**  
+
+### The Tower Property
+
 The famous formula in probability theory,
 
 ```
@@ -49,47 +71,33 @@ variables Y, U and V,
 ``` 
    E[ E(Y|U,V) | U ] = E(Y | U) 
 ``` 
-   
+
+### How it solves our problem:
+ 
 What this theoretical abstraction says is that if we take the regression
 function of Y on U and V, and average it over V for fixed U, we get the
-regression function of Y on U.  
+regression function of Y on U.  If V is missing but U is known, this is
+very useful.  
 
-If V is missing but U is known, this is very useful.  Take the Census
-data, included in the package,  on programmer and engineer wages, with
-predictors age, education, occupation, gender and number of weeks
-worked. Say we need to predict a case in which age and gender are
-missing.  Then (under proper assumptions), our prediction might be the
-estimated value of the regression function of wage on education,
-occupation and weeks worked, i.e. the marginal regression function of
-wage on those variables.
-
-Since each new case to be predicted will likely have a different
-pattern of which variables are missing, we would need to estimate many
-(potentially 2<sup>p</sup>) marginal regression functions. This would
-in many applications be computationally infeasible, as each marginal
-model would need to be fitted and run through diagnostic plots and the
-like.
-
-But the Tower Property provides an alternative.  It tells us that we can
-obtain the marginal regression functions from the full one.  So, we fit
-the full model to the complete cases in the data, then average that
-model over all data points whose values for education, occupation and
-weeks worked match those in the new case to be predicted.  Thus only the
-full model need be estimated, rather than 2<sup>p</sup> models.
-
-In the Tower Property above, for a new case in which education,
-occupation and weeks worked are known while age and gender are missing,
+In the example above, for a new case in which Education,
+Occupation and Weeks Worked are known while Age and Gender are missing,
 we would have
 
 ```
-U  = (education,occupation,weeks worked)
-V = (age,gender)
+U  = (Education,Occupation,Weeks Worked)
+V = (Age,Gender)
 ```
 
 E(Y|U) is the target marginal regression function that we wish to
 estimate and then use to predict the new case in hand.  The Tower
 Property implies that we can obtain that estimate by the averaging
 process described above.
+
+Specifically, we fit the full model to the complete cases in the data,
+then average that model over all data points whose values for Education,
+Occupation and Weeks Worked match those in the new case to be predicted.
+Thus only the full model need be estimated, rather than 2<sup>p</sup>
+models.
 
 Our function **toweranNA()** ("tower analysis with NAs") takes this
 approach.  Usually, there may not be many data points having the exact
@@ -99,6 +107,8 @@ points near that value.
 Moreover, an early *Biometrika* paper by one of us (summarized in
 (Matloff, 2017, Sec. 7.5)) showed that regression averaging improves
 estimation of means, even with no MVs, thus an added bonus. 
+
+### Usage
 
 The call form is
 
@@ -118,11 +128,12 @@ where the arguments are:
 
 * **newx**: The "X" data frame for the data to be predicted.  
 
-* **sacleX**: If TRUE, scale **newx** before performing the analysis
+* **scaleX**: If TRUE, scale **newx** before performing the analysis
 
 The scaling argument should be set to TRUE if the
 **fittedReg** was derived with scaled X data; if so, **newx** will also
-be run through R's **scale()** function.
+be run through R's **scale()** function.  (The same scaling will be used
+for **x** and **newx**.)
 
 The number of neighbors is of course a tuning parameter chosen by the
 analyst.  Since we are averaging fitted regression estimates, which are
@@ -131,7 +142,8 @@ by definition already smoothed, a small value of **k** should work well.
 ## Example:  Vocabulary acquisition
 
 This data is from the Stanford University Wordbank project.  The data,
-**english**, is included in the <strong>toweranNA</strong> package.  Of
+**english**, is included in the <strong>toweranNA</strong> package
+(inherited from the included **regtools** package).  Of
 the non-administrative variables, e.g. excluding 'Language', which is
 always English in this data, about 43 percent of the values are missing.
 To illustrate how fitting and prediction occur, let's fit to the
@@ -140,27 +152,19 @@ observations having missing values:
 ``` r
 data(english)
 eng <- english[,c(2,5:8,10)] 
-eng <- factorsToDummies(eng)  # since use neighbors, can't have factors
+# since use neighbors, can't have factors; use
+# regtools::factorsToDummies()
+eng <- factorsToDummies(eng)  
 cc <- complete.cases(eng)
 engcc <- eng[cc,]
 engicc <- eng[!cc,]
-lmout <- lm(vocab ~ .,data=engcc) 
+# temp back to data frame for lm()
+lmout <- lm(vocab ~ .,data=as.data.frame(engcc)) 
 # let's predict the incomplete cases
-incomp <- !complete.cases(engtst[,-20])
 towerout <- toweranNA(engcc,lmout$fitted.values,5,engicc[,-20],scaleX=FALSE) 
 ```
 
 The predicted values for **engicc** are now in the vector **towerout**.
-
-To assess how well the process works, let's do the following.  In
-ordinary regression analysis, R<sup>2</sup> is the squared correlation
-between predicted Y and actual Y.  Let's compute that here, pretending
-our Y values are missing:
-
-``` r
-> cor(towerout,engicc[,20])^2
-[1] 0.6415378
-```
 
 ## Example:  Gold time series 
 
@@ -259,6 +263,11 @@ is more robust to assumptions than is estimation.  This would be similar
 to the non-MV setting, in which models can be rather questionable yet
 still have strong predictive power.
 
+Compared to **Amelia** and **mice**, **toweranNA** has far less
+restrictive assumptions.  E.g. **Amelia** assumes multivariate
+normality of the X vector, an assumption not even approximately met when
+some components of X are categorical variables.
+
 ## Future Work
 
 For some datasets, there may be few, if any, complete cases.  Say p =
@@ -267,6 +276,15 @@ with just one predictor missing.  Then it may be worth computing the 10
 marginal regression functions, and proceeding as before.  In that
 manner, we may cover most new cases to be predicted (and use another
 method for the rest).  Code to automate this will be added.
+
+## Conclusions
+
+The **toweranNA** method handles missing values in applications in which
+the main goal is prediction, not estimation.  Our method has major
+advantages over **mice** and **Amelia**, in that our method (a) has no
+convergence or execution erorr problem, (b) does not make heavy
+distributional assumptions, and (c) performs as well or better than the
+other two methods in test we've run.
 
 ## References
 
@@ -277,7 +295,9 @@ M. Jones, Indicator and Stratification Methods for Missing Explanatory
 Variables in Multiple Linear Regression, *JASA*m 1996
 
 N. Matloff, Statistical Regression and Classification: from Linear
-Models to Machine Learning, 2017, CRC Press
+Models to Machine Learning, 2017, CRC Press; summarizing N. Matloff,
+Use of Regression Functions for Improved Estimation of Means,
+*Biometrika*, 1981
 
 O.S. Miettinen, *Theoretical Epidemiology:
 Principles of Occurrence Research in Medicine*, 1985
