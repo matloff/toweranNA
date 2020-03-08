@@ -22,7 +22,27 @@ See ?towerLM and ?regtools::TStoX
 \item{NAIdx}{Indices of the original missing.}
 }
 \references{
-See https://github.com/matloff/toweranNA for detail and latest links,
+See https://github.com/matloff/toweranNA for detail and latest links. 
+
+X. Gu and N. Matloff, A Different Approach to the Problem of Missing
+Data, Proceedings of the Joint Statistical Meetings, 2015
+
+M. Jones, Indicator and Stratification Methods for Missing Explanatory
+Variables in Multiple Linear Regression, JASA 1996
+
+N. Matloff, Statistical Regression and Classification: from Linear
+Models to Machine Learning, 2017, CRC Press; summarizing N. Matloff,
+Use of Regression Functions for Improved Estimation of Means,
+Biometrika, 1981
+
+O.S. Miettinen, Theoretical Epidemiology:
+Principles of Occurrence Research in Medicine, 1985
+
+U. Nur et al, Modelling relative survival in the presence of
+incomplete data: a tutorial, Int. J. Epidemiology, 2010
+
+S. Soysal et al, the Effects of Sample Size and Missing Data Rates on
+Generalizability Coefficients, Eurasian J. of Ed. Res., 2018
 }
 \author{
 Norm Matloff,
