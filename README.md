@@ -14,7 +14,7 @@ nonparametric/machine learning methods.
 
 Most of the MV literature, both in the statistics and machine learning
 realms, concerns estimation of some relationship,  say estimation of
-regression coefficients and the like.  By constrast, our emphasis here
+linear regression coefficients and the like.  By constrast, our emphasis here
 is on **PREDICTION**, especially relevant in our AI era.  The main
 contribution of this package is a technique that we call the Tower
 Method, which is **directly aimed at prediction**. It is
@@ -23,7 +23,12 @@ motivated by prediction, see for instance (Soysal, 2018) and (Gu,
 2015).)
 
 To make things concrete, say we are regressing Y on a vector X of p
-predictors.  We have data on X in a matrix A of n rows, thus of
+predictors.  Here we use the term *regression function* in its general
+sense, the mean of Y given X.  That function might be estimated using a
+parametric linear or logistic model, or by a nonparametric approach such
+as the machine learning functions.
+
+We have data on X in a matrix A of n rows, thus of
 dimensions n x p.  Some of the elements of A are missing, i.e. are NA
 values in the R language.  We are definitely including the
 classification case here, so that Y is a vector of 0s and 1s (two-class
@@ -51,8 +56,8 @@ Since each new case to be predicted will likely have a different
 pattern of which variables are missing, we would need to estimate many
 (potentially 2<sup>p</sup>) marginal regression functions. This would
 in many applications be computationally infeasible, as each marginal
-model would need to be fitted and run through diagnostic plots and the
-like.
+model would need to be fitted and run through diagnostic plots,
+hyperparameter investigation, and the like.
 
 **But the Tower Property provides an alternative.**  It tells us that **we can
 obtain the marginal regression functions from the full one.**  
@@ -132,8 +137,10 @@ where the arguments are:
 
 The scaling argument should be set to TRUE if the
 **fittedReg** was derived with scaled X data; if so, **newx** will also
-be run through R's **scale()** function.  (The same scaling will be used
-for **x** and **newx**.)
+be run through R's **scale()** function.  (The same scaling must be used
+for **x** and **newx**; if for instance R's **scale()**) is used on **x**,
+the attributss 'scaled:center' and 'scaled:center' must be saved and
+applied to **newx**.)
 
 The number of neighbors is of course a tuning parameter chosen by the
 analyst.  Since we are averaging fitted regression estimates, which are
@@ -146,22 +153,22 @@ This data is from the Stanford University Wordbank project.  The data,
 (inherited from the included **regtools** package).  Of
 the non-administrative variables, e.g. excluding 'Language', which is
 always English in this data, about 43 percent of the values are missing.
-To illustrate how fitting and prediction occur, let's fit to the
-observations having missing values:
+To illustrate how fitting and prediction occur, let's fit to the intact
+observations and then predict Y for the cases having missing values:
 
 ``` r
 data(english)
-eng <- english[,c(2,5:8,10)] 
-# since use neighbors, can't have factors; use
-# regtools::factorsToDummies()
-eng <- factorsToDummies(eng)  
-cc <- complete.cases(eng)
-engcc <- eng[cc,]
-engicc <- eng[!cc,]
-# temp back to data frame for lm()
-lmout <- lm(vocab ~ .,data=as.data.frame(engcc)) 
-# let's predict the incomplete cases
-towerout <- toweranNA(engcc,lmout$fitted.values,5,engicc[,-20],scaleX=FALSE) 
+# for simplicity:
+english1 <- english[,c('age','sex','vocab')]
+# make numeric
+english1$sex <- as.integer(english1$sex == 'Female')
+# fit to complete cases
+eng1 <- na.exclude(english1)
+lmout <- lm(vocab ~ .,eng1)
+# predict vocab for a new case
+newx <- data.frame(age=28,sex=1)
+toweranNA(eng1,lmout$fitted.values,5,newx,scaleX=FALSE)
+# outputs 490.7388
 ```
 
 The predicted values for **engicc** are now in the vector **towerout**.
