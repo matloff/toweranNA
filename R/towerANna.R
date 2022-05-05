@@ -81,7 +81,9 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
          tmp <- pdist(rwm[1,],x[,ic])@dist
          nni <- which.min(tmp)
       } else {
-         tmp <- get.knnx(data = x[,ic],query = rwm, k = k)
+         xic <- x[,ic,drop=FALSE]
+         if (k <= nrow(xic)) stop('too few intact neigbors, use smaller k')
+         tmp <- get.knnx(data = xic,query = rwm, k = k)
          nni <- tmp$nn.index
       }
       if (!multiclass) {
