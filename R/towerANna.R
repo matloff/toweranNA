@@ -82,7 +82,7 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
          nni <- which.min(tmp)
       } else {
          xic <- x[,ic,drop=FALSE]
-         if (k <= nrow(xic)) stop('too few intact neigbors, use smaller k')
+         if (k > nrow(xic)) stop('too few intact neigbors, use smaller k')
          tmp <- get.knnx(data = xic,query = rwm, k = k)
          nni <- tmp$nn.index
       }
