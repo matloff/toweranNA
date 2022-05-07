@@ -82,8 +82,11 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
          nni <- which.min(tmp)
       } else {
          xic <- x[,ic,drop=FALSE]
-         if (k > nrow(xic)) stop('too few intact neigbors, use smaller k')
-         tmp <- get.knnx(data = xic,query = rwm, k = k)
+         if (k > nrow(xic)) {
+            kThisTime <- nrow(xic)
+            warning('too few intact neigbors, temp reduced k')
+         } else kThisTime <- k
+         tmp <- get.knnx(data = xic,query = rwm, k = kThisTime)
          nni <- tmp$nn.index
       }
       if (!multiclass) {
