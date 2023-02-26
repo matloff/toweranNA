@@ -1,3 +1,14 @@
+
+---
+title: "Quick Start"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick Start}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
 # toweranNA 
 
 A **nonimputational**  method for handling missing values (MVs) in
