@@ -6,36 +6,39 @@
 # arguments:
 
 #    x: matrix/data frame of "X" values, numeric, all complete cases
-#    fittedReg: fitted regression values; see below 
+#    fittedReg: fitted regression values from "X"; see below 
 #    k: number of nearest neighbors
-#    scaleX: scale x and newx before prediction
 #    newx: matrix/data frame of new "X" values
 
 # in the case of regression or a 2-class classification problem,
 # 'fittedReg' will be the estimated regression function, evaluated at x; 
-# e.g. the compoment 'fitted.values' from lm() output
+# e.g. the compoment 'fitted.values' from lm() or glm() output
 
 # for a multiclass classification problem, 'fittedReg' will be a matrix,
 # with number of columns equal to number of classes, and number of rows
 # equal to that of 'newx'; the (i,j) element will be the estimated
 # conditional probability of that class, given row i of x
 
-# the purpose of scaling x and newx is that the k-NN ops will be better
-# if all the predictor variables are commensurate
+# if scaling was used to generate fittedReg, the user is responsible for
+# ensuring that newx uses the same scaling
 
-# value: vector of predicted values
+# value: vector of predicted values; these take the form of
+# probabilities in the 2-class case, and a matrix of probabilities in
+# the multiclass case
 
-toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE) 
+toweranNA <- function(x,fittedReg,k=1,newx) 
 {
    # k-NN requires NA-free data
    if (sum(is.na(x)) > 0)  
       stop('x must be NA-free; call complete.cases()')
+
    # k-NN requires numerical data
    factors <- sapply(x,is.factor)  
    if (any(factors)) {
       stop('Factors present in X data but numerical data are required. Convert using regtools::factorsToDummies().')
    }
-   # method cannot predict a data point consisting of all NAs
+
+   # method cannot predict a newx row consisting of all NAs
    allNA <- function(w) all(is.na(w))
    allna <- apply(newx,1,allNA)
    sumAllNA <- sum(allna)
@@ -48,13 +51,7 @@ toweranNA <- function(x,fittedReg,k=1,newx,scaleX=TRUE)
    if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
       fittedReg <- as.vector(fittedReg)
    multiclass <- is.matrix(fittedReg)
-   nc <- ncol(x)
-   if (scaleX) {
-      x <- scale(x,center=TRUE,scale=TRUE)
-      # retain the scaling parameters to use in newx
-      xmns <- attr(x,'scaled:center')
-      xsds <- attr(x,'scaled:scale')
-   }
+   ncx <- ncol(x)
    # set up space for the predictions
    if (!multiclass) {
        preds <- vector(length = nrow(newx))
