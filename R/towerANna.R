@@ -26,7 +26,8 @@
 # probabilities in the 2-class case, and a matrix of probabilities in
 # the multiclass case
 
-toweranNA <- function(x,fittedReg,k=1,newx) 
+# toweranNA <- function(x,fittedReg,k=1,newx) 
+makeTower <- function(x,fittedReg) 
 {
    # k-NN requires NA-free data
    if (sum(is.na(x)) > 0)  
@@ -37,6 +38,23 @@ toweranNA <- function(x,fittedReg,k=1,newx)
    if (any(factors)) {
       stop('Factors present in X data but numerical data are required. Convert using regtools::factorsToDummies().')
    }
+   # multiclass Y will have fittedReg as a matrix, otherwise vector
+   if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
+      fittedReg <- as.vector(fittedReg)
+   multiclass <- is.matrix(fittedReg)
+   ncx <- ncol(x)
+   returnObj <- list(x=x,fittedReg=fittedReg,multiclass=multiclass)
+   class(returnObj) <- 'tower'
+   returnObj
+}
+
+predict.tower <- function(towerObj,newx,k=1)
+{
+   x <- towerObj$x
+   fittedReg <- towerObj$fittedReg
+   multiclass <- towerObj$multiclass
+
+   if (is.vector(newx)) newx <- matrix(newx,nrow=1)
 
    # method cannot predict a newx row consisting of all NAs
    allNA <- function(w) all(is.na(w))
@@ -47,11 +65,7 @@ toweranNA <- function(x,fittedReg,k=1,newx)
       print(which(allna))
       stop("Drop rows which are all NA.")
    }
-   # multiclass Y will have fittedReg as a matrix, otherwise vector
-   if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
-      fittedReg <- as.vector(fittedReg)
-   multiclass <- is.matrix(fittedReg)
-   ncx <- ncol(x)
+
    # set up space for the predictions
    if (!multiclass) {
        preds <- vector(length = nrow(newx))
@@ -70,10 +84,10 @@ toweranNA <- function(x,fittedReg,k=1,newx)
       # kludgy but if x is a data frame get problems with scale()
       rwm <- as.matrix(rw)
       rwm <- matrix(rwm,nrow=1)
-      if (scaleX) {
-         # rw <- scale(matrix(rw, nrow=1),center=xmns[ic],scale=xsds[ic])
-         rwm <- scale(rwm,center=xmns[ic],scale=xsds[ic])
-      }
+#       if (scaleX) {
+#          # rw <- scale(matrix(rw, nrow=1),center=xmns[ic],scale=xsds[ic])
+#          rwm <- scale(rwm,center=xmns[ic],scale=xsds[ic])
+#       }
       if (k == 1) {
          tmp <- pdist(rwm[1,],x[,ic])@dist
          nni <- which.min(tmp)
