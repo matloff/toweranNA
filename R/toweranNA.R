@@ -43,7 +43,7 @@ makeTower <- function(data,yName,regFtnName,opts=NULL,scaling,yesYVal=NULL)
       saveXfactorIno <- attr(x,'factorsInfo')
    }
 
-   # and for "Y"
+   # and for "Y" as well
    origY <- y
    if (classif) {
       if (!multiclass) {
@@ -56,6 +56,13 @@ makeTower <- function(data,yName,regFtnName,opts=NULL,scaling,yesYVal=NULL)
    }
 
    # fit the regression model
+   if (multiclass && regFtnName != 'kNN')
+      stop('only kNN set up for multiclass case for now')
+   ### if (regFtnName == 'lm') {
+   ###    ftnCall <- sprintf('lm(%s ~ .,
+   }
+
+
 
    returnObj <- list(x=x,fittedReg=fittedReg,multiclass=multiclass)
    class(returnObj) <- 'tower'
