@@ -5,44 +5,56 @@
 
 # arguments:
 
-#    x: matrix/data frame of "X" values, numeric, all complete cases
-#    fittedReg: fitted regression values from "X"; see below 
-#    k: number of nearest neighbors
-#    newx: matrix/data frame of new "X" values
+#    data: a data frame or equivalent, consisting of numeric and/or factor
+#    variables
 
-# in the case of regression or a 2-class classification problem,
-# 'fittedReg' will be the estimated regression function, evaluated at x; 
-# e.g. the compoment 'fitted.values' from lm() or glm() output
+#    yName: name of the column in 'data' for "Y"; the other columns form
+#    "X"; if "Y" is dichotomous or categorical
 
-# for a multiclass classification problem, 'fittedReg' will be a matrix,
-# with number of columns equal to number of classes, and number of rows
-# equal to that of 'newx'; the (i,j) element will be the estimated
-# conditional probability of that class, given row i of x
+#    regFtnName:  current choices are 'lm','glm' (with family=binomial),
+#       and kNN (from regtools package)
 
-# if scaling was used to generate fittedReg, the user is responsible for
-# ensuring that newx uses the same scaling
+#    opts: optional arguments for the call to the regression function;
+#       in the form of a string, e.g. 'a=3,b=8'
 
-# value: vector of predicted values; these take the form of
-# probabilities in the 2-class case, and a matrix of probabilities in
-# the multiclass case
+#    scaling: if TRUE, scaling will be done on "X", using 'scale' 
 
-# toweranNA <- function(x,fittedReg,k=1,newx) 
-makeTower <- function(x,fittedReg) 
+#    yesYVal: in dichotomous case, which value should be coded as 1
+
+# value: object of class 'tower', for which the predict() method
+# predict.tower() is available
+
+# note that the predict() function will later need NA-free data, no
+# matter which regression model is used
+
+makeTower <- function(data,yName,regFtnName,opts=NULL,scaling,yesYVal=NULL) 
 {
-   # k-NN requires NA-free data
-   if (sum(is.na(x)) > 0)  
-      stop('x must be NA-free; call complete.cases()')
+   yCol <- which(names(data) == yName)
+   x <- data[,-yCol]
+   y <- data[,yCol]
+   classif <- is.factor(y)
+   multiclass <- classif && length(levels(y)) > 2
 
-   # k-NN requires numerical data
+   # convert any "X" factors
    factors <- sapply(x,is.factor)  
+   origX <- x
    if (any(factors)) {
-      stop('Factors present in X data but numerical data are required. Convert using regtools::factorsToDummies().')
+      x <- regtools::factorsToDummies(x,omitLast-TRUE)
    }
-   # multiclass Y will have fittedReg as a matrix, otherwise vector
-   if (is.matrix(fittedReg) && ncol(fittedReg) == 1) 
-      fittedReg <- as.vector(fittedReg)
-   multiclass <- is.matrix(fittedReg)
-   ncx <- ncol(x)
+
+   # and for "Y"
+   origY <- y
+   if (classif) {
+      if (!multiclass) {
+         if (is.null(yesYVal)) stop('must specify yesYVal')
+         y <- as.integer(y == yesYVal)
+      } else {
+         y <- regtools::factorsToDummies(y,omitLast=FALSE)
+      }
+   }
+
+   # fit the regression model
+
    returnObj <- list(x=x,fittedReg=fittedReg,multiclass=multiclass)
    class(returnObj) <- 'tower'
    returnObj
