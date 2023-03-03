@@ -40,6 +40,7 @@ makeTower <- function(data,yName,regFtnName,opts=NULL,scaling,yesYVal=NULL)
    origX <- x
    if (any(factors)) {
       x <- regtools::factorsToDummies(x,omitLast-TRUE)
+      saveXfactorIno <- attr(x,'factorsInfo')
    }
 
    # and for "Y"
@@ -50,6 +51,7 @@ makeTower <- function(data,yName,regFtnName,opts=NULL,scaling,yesYVal=NULL)
          y <- as.integer(y == yesYVal)
       } else {
          y <- regtools::factorsToDummies(y,omitLast=FALSE)
+         saveYfactorIno <- attr(x,'factorsInfo')
       }
    }
 
