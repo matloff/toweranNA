@@ -94,9 +94,7 @@ predict.tower <- function(towerObj,newx,k=1)
    allna <- apply(newx,1,allNA)
    sumAllNA <- sum(allna)
    if (sumAllNA > 0)  {
-      print('some rows of newx were all NAs\n:')
-      print(which(allna))
-      stop("Drop rows which are all NA.")
+      stop("drop rows that are all NA")
    }
 
    # set up space for the predictions
@@ -106,21 +104,24 @@ predict.tower <- function(towerObj,newx,k=1)
        preds <- matrix(nrow = nrow(newx),ncol = ncol(fittedReg))
    }
    for (i in 1:nrow(newx)) {
+
       rw <- newx[i,]
+
+      # restrict to non-NA elements
       intactCols <- which(!is.na(rw))
       ic <- intactCols
-      if (length(ic) == 0) {
-         warning('a newx row has is all NAs, skipping i')
-         next
-      }
       rw <- rw[ic]
-      # kludgy but if x is a data frame get problems with scale()
+      
+      # peform scaling, if needed
       rwm <- as.matrix(rw)
       rwm <- matrix(rwm,nrow=1)
-#       if (scaleX) {
-#          # rw <- scale(matrix(rw, nrow=1),center=xmns[ic],scale=xsds[ic])
-#          rwm <- scale(rwm,center=xmns[ic],scale=xsds[ic])
-#       }
+      if (scaleX) {
+         # rw <- scale(matrix(rw, nrow=1),center=xmns[ic],scale=xsds[ic])
+         rwm <- scale(rwm,center=scaling$center$,scale=scaling:scale)
+      }
+
+      # find neighbors; nni will be the index/indices in x of the near
+      # neigbors
       if (k == 1) {
          tmp <- pdist(rwm[1,],x[,ic])@dist
          nni <- which.min(tmp)
@@ -133,18 +134,14 @@ predict.tower <- function(towerObj,newx,k=1)
          tmp <- get.knnx(data = xic,query = rwm, k = kThisTime)
          nni <- tmp$nn.index
       }
+
       if (!multiclass) {
          preds[i] <- mean(fittedReg[nni])
       } else {
          preds[i,] <- colMeans(fittedReg[nni,])
       }
    }
-   # decided above to just bail if have any all-NA rows
-   # if (someAllNA) {   
-   #    altPreds <- rep(NA,length(allna))
-   #    altPreds[!allna] <- preds
-   #    preds <- altPreds
-   # }
+   
    preds
 }
 
