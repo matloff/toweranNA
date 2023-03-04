@@ -17,7 +17,7 @@
 #    opts: optional arguments for the call to the regression function;
 #       in the form of a string, e.g. 'a=3,b=8'
 
-#    scaling: if TRUE, scaling will be done on "X", using 'scale' 
+#    scaling: if not NULL, scaling will be done on "X", using 'scale' 
 
 #    yesYVal: in dichotomous case, which value should be coded as 1
 
@@ -27,44 +27,56 @@
 # note that the predict() function will later need NA-free data, no
 # matter which regression model is used
 
-makeTower <- function(data,yName,regFtnName,opts=NULL,scaling,yesYVal=NULL) 
+makeTower <- 
+   function(data,yName,regFtnName,opts=NULL,scaling=NULL,yesYVal=NULL) 
 {
    yCol <- which(names(data) == yName)
-   x <- data[,-yCol]
-   y <- data[,yCol]
-   classif <- is.factor(y)
-   multiclass <- classif && length(levels(y)) > 2
+      x <- data[,-yCol]
+      y <- data[,yCol]
+      classif <- is.factor(y)
+      multiclass <- classif && length(levels(y)) > 2
 
-   # convert any "X" factors
-   factors <- sapply(x,is.factor)  
-   origX <- x
-   if (any(factors)) {
-      x <- regtools::factorsToDummies(x,omitLast-TRUE)
-      saveXfactorIno <- attr(x,'factorsInfo')
+# convert any "X" factors
+      factors <- sapply(x,is.factor)  
+      origX <- x
+      saveXfactorInfo <- NULL
+      if (any(factors)) {
+         x <- regtools::factorsToDummies(x,omitLast=TRUE)
+         saveXfactorInfo <- attr(x,'factorsInfo')
+      }
+
+   if (!is.null(scaling)) {
+      x <- scale(x)
+      scaling <- list(center=attr(x,'scaled:center'),
+                      scale=attr(x,'scaled:scale'))
+
    }
 
    # and for "Y" as well
    origY <- y
+   saveYfactorInfo <- NULL
    if (classif) {
       if (!multiclass) {
          if (is.null(yesYVal)) stop('must specify yesYVal')
          y <- as.integer(y == yesYVal)
       } else {
          y <- regtools::factorsToDummies(y,omitLast=FALSE)
-         saveYfactorIno <- attr(x,'factorsInfo')
+         saveYfactorInfo <- attr(x,'factorsInfo')
       }
    }
 
    # fit the regression model
    if (multiclass && regFtnName != 'kNN')
       stop('only kNN set up for multiclass case for now')
-   ### if (regFtnName == 'lm') {
-   ###    ftnCall <- sprintf('lm(%s ~ .,
+   if (regFtnName == 'lm') {
+      ftnCall <- sprintf('lm(%s ~ .,data)',yName)
+      tmp <- evalr(ftnCall)
+      fittedReg <- tmp$fitted.values
    }
 
-
-
-   returnObj <- list(x=x,fittedReg=fittedReg,multiclass=multiclass)
+   returnObj <- list(regFtnName=regFtnName,x=x,fittedReg=fittedReg,
+      classif=classif,multiclass=multiclass,saveXfactorInfo=saveXfactorInfo,
+      saveYfactorInfo=saveYfactorInfo,scaling=scaling)
    class(returnObj) <- 'tower'
    returnObj
 }
