@@ -72,8 +72,13 @@ makeTower <-
       ftnCall <- sprintf('lm(%s ~ .,data)',yName)
       tmp <- evalr(ftnCall)
       fittedReg <- tmp$fitted.values
+   } else if (regFtnName == 'glm') {
+      ftnCall <- sprintf('glm(%s ~ .,data,family=binomial)',yName)
+      tmp <- evalr(ftnCall)
+      fittedReg <- tmp$fitted.values
    }
 
+   # package it and done
    returnObj <- list(regFtnName=regFtnName,x=x,fittedReg=fittedReg,
       classif=classif,multiclass=multiclass,saveXfactorInfo=saveXfactorInfo,
       saveYfactorInfo=saveYfactorInfo,scaling=scaling)
@@ -116,8 +121,7 @@ predict.tower <- function(towerObj,newx,k=1)
       rwm <- as.matrix(rw)
       rwm <- matrix(rwm,nrow=1)
       if (scaleX) {
-         # rw <- scale(matrix(rw, nrow=1),center=xmns[ic],scale=xsds[ic])
-         rwm <- scale(rwm,center=scaling$center$,scale=scaling:scale)
+         rwm <- scale(rwm,center=scaling$center,scale=scaling$scale)
       }
 
       # find neighbors; nni will be the index/indices in x of the near
