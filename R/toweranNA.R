@@ -91,6 +91,7 @@ predict.tower <- function(towerObj,newx,k=1)
    x <- towerObj$x
    fittedReg <- towerObj$fittedReg
    multiclass <- towerObj$multiclass
+   scaling <- towerObj$scaling
 
    if (is.vector(newx)) newx <- matrix(newx,nrow=1)
 
@@ -120,7 +121,7 @@ predict.tower <- function(towerObj,newx,k=1)
       # peform scaling, if needed
       rwm <- as.matrix(rw)
       rwm <- matrix(rwm,nrow=1)
-      if (scaleX) {
+      if (!is.null(scaling)) {
          rwm <- scale(rwm,center=scaling$center,scale=scaling$scale)
       }
 
