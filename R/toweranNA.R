@@ -31,19 +31,25 @@ makeTower <-
    function(data,yName,regFtnName,opts=NULL,scaling=NULL,yesYVal=NULL) 
 {
    yCol <- which(names(data) == yName)
-      x <- data[,-yCol]
-      y <- data[,yCol]
-      classif <- is.factor(y)
-      multiclass <- classif && length(levels(y)) > 2
+   x <- data[,-yCol]
+   y <- data[,yCol]
+   if (is.null(y)) stop('check spelling of yName')
+   classif <- is.factor(y)
+   multiclass <- classif && length(levels(y)) > 2
 
-# convert any "X" factors
-      factors <- sapply(x,is.factor)  
-      origX <- x
-      saveXfactorInfo <- NULL
-      if (any(factors)) {
-         x <- regtools::factorsToDummies(x,omitLast=TRUE)
-         saveXfactorInfo <- attr(x,'factorsInfo')
-      }
+   # get complete cases
+   origX <- x
+   ccs <- which(complete.cases(x))
+   x <- x[ccs,]
+   y <- y[ccs]
+
+   # convert any "X" factors
+   factors <- sapply(x,is.factor)  
+   saveXfactorInfo <- NULL
+   if (any(factors)) {
+      x <- regtools::factorsToDummies(x,omitLast=TRUE)
+      saveXfactorInfo <- attr(x,'factorsInfo')
+   }
 
    if (!is.null(scaling)) {
       x <- scale(x)
@@ -59,7 +65,7 @@ makeTower <-
       if (!multiclass) {
          if (is.null(yesYVal)) stop('must specify yesYVal')
          y <- as.integer(y == yesYVal)
-      } else {
+      } else {  # multiclass case
          y <- regtools::factorsToDummies(y,omitLast=FALSE)
          saveYfactorInfo <- attr(x,'factorsInfo')
       }
@@ -76,7 +82,9 @@ makeTower <-
       ftnCall <- sprintf('glm(%s ~ .,data,family=binomial)',yName)
       tmp <- evalr(ftnCall)
       fittedReg <- tmp$fitted.values
-   }
+   } else if (regFtnName == 'kNN') {
+   browser()
+   } else stop('invalid regression model')
 
    # package it and done
    returnObj <- list(regFtnName=regFtnName,x=x,fittedReg=fittedReg,
