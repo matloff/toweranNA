@@ -1,5 +1,5 @@
 
-export(toweranNA)
+export(makeTower)
 export(countnas)
 export(checkConstCols)
 export(towerLM)
@@ -13,3 +13,6 @@ importFrom(FNN,get.knnx)
 importFrom(regtools,TStoX)
 importFrom(regtools,factorToDummies)
 importFrom(regtools,factorsToDummies)
+
+S3method(predict,tower)
+
