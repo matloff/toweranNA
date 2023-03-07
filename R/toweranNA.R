@@ -104,7 +104,10 @@ predict.tower <- function(towerObj,newx,k=1)
 
    if (is.vector(newx)) {
       newx <- matrix(newx,nrow=1)
-      colnames(newx) <- names(towerOut$saveXfactorInfo)
+      colnames(newx) <- names(towerObj$saveXfactorInfo)
+   } else if (is.data.frame(newx)) {
+      newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
+         factorsInfo=saveXfactorInfo)
    }
 
    # method cannot predict a newx row consisting of all NAs
@@ -115,9 +118,6 @@ predict.tower <- function(towerObj,newx,k=1)
       stop("drop newx rows that are all NA")
    }
 
-   # convert factors
-   newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
-      factorsInfo=saveXfactorInfo)
 
    # set up space for the predictions
    if (!multiclass) {
