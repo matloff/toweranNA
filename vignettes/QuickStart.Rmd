@@ -216,19 +216,19 @@ process described above.
 Specifically, we fit the full model to the complete cases in the data,
 then average that model over all data points whose values for which the
 values of age, birth order and ethnicity match those in the new case to
-be predicted.  Thus only the full model need be estimated, rather than
-2<sup>p</sup> models.
+be predicted.  **Thus only the full model need be estimated, rather than
+2<sup>p</sup> models.**
 
-Our function **toweranNA()** ("tower analysis with NAs") takes this
+Our package **toweranNA** ("tower analysis with NAs") takes this
 approach.  Usually, there may not be many data points having the exact
 value specified for U, if any, so we average over a neighborhood of
-points near that value.  
-
-Since we are averaging fitted regression estimates, which are
-by definition already smoothed, a small value of **k** should work well.  
+points near that value.  The argument **k** specifies the number o near
+neighbors.  Since we are averaging fitted regression estimates, which
+are by definition already smoothed, a small value of **k** should work
+well.  
 
 Moreover, an early *Biometrika* paper by one of us (summarized in
-(Matloff, 2017, Sec. 7.5)) showed that regression averaging improves
+(Matloff, 2017, Sec. 7.5)) proved that regression averaging improves
 estimation of means, even with no MVs, thus an added bonus. 
 
 # Application to Time Series
@@ -243,8 +243,9 @@ consisting of 1108 daily gold prices.   The series does have some NAs,
 including two in the final 10 data points:
 
 ``` r
-> gold[1099:1108]
- [1] 395.30 394.10 393.40 396.00     NA     NA 391.25 383.30 384.00 382.30
+data(gold,package='forecast')
+gold[1099:1108]
+# [1] 395.30 394.10 393.40 396.00     NA     NA 391.25 383.30 384.00 382.30
 ```
 Let's predict the 1109th data point, using the Tower Method:
 
@@ -254,13 +255,12 @@ dim(gx)
 # 1098   11
 # row i contains gx[i], gx[i+1,...,gx[i+10]
 gxd <- as.data.frame(gx)
-gxdcc <- gxd[complete.cases(gxd),]
-lmout <- lm(V11 ~ .,data=gxd)
-fits <- lmout$fitted.values 
-x1109 <- gold[1099:1108]  # X for predictig gold[1109]
+twout <- makeTower(gxd,'V11','lm') 
+x1109 <- gold[1099:1108]  # X for predicting gold[1109] 
 x1109 <- matrix(x1109,nrow=1)
-toweranNA(gxdcc,fits,5,x1109)
-# 383.0053
+colnames(x1109) <- colnames(gxd[,-11])
+predict(twout,x1109) 
+# 393.8496
 ```
 
 The function **TStoX()**, which the package imports from **regtools**,
@@ -270,12 +270,6 @@ row by the 10 most recent points.  That 11th column is the original time
 series, minus the first 10 observations.  So, the call to **lm()** is
 loosely autoregressive, with each time point predicted from the previous
 10.
-
-# Wrapper functions
-
-The package includes functions **towerLM()** and **towerTS()** to wrap
-the several operations seen in the worked examples above, e.g.
-extracting the complete cases.
 
 # Assumptions
 
