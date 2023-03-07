@@ -21,23 +21,131 @@ specifically for **prediction applications.**
 
 # Overview: the Goal Is Prediction, Not Statistical Inference
 
-**The intended class of applications is predictive modeling, rather than
-estimation.**  Predictive methods of any type can be used with our Tower
+There are a number of powerful R packages for handling missing values
+(MVs), such as *Amelia* and *mice*.  They "fill in the blanks" in 
+MV-ridden datasets, so as to enable the user to do statistical inference
+on the completed data.
+
+These methods are typical not capable of predicting new cases that have
+MVs.  With the *toweranNA* package, **the intended class of applications
+is predictive modeling, rather than estimation.**  
+
+Predictive methods of any type can be used with our Tower
 Method, including both linear/generalized linear models and
 nonparametric/machine learning methods. 
 
-*Notation*  We have a dataset in which one of the columns, Y, is to be
-predicted in the future.  The remaining columns, collectively referred
-to as X, are the predictor variables/features.
+# Usage
 
-Most of the MV literature, both in the statistics and machine learning
-realms, concerns estimation of some relationship,  say estimation of
-linear regression coefficients and the like.  By constrast, our emphasis here
-is on **PREDICTION**, especially relevant in our AI era.  The main
-contribution of this package is a technique that we call the Tower
-Method, which is **directly aimed at prediction**. It is
-nonimputational, i.e. we do not make guesses as to the missing values in
-X.
+The function **makeTower** takes the data and regression model as input,
+and creates an object of class 'tower'.  New cases can then be predicted
+by calling **predict()** on that object.
+
+The call forms are: 
+
+``` r
+makeTower(data, yName, regFtnName, opts = NULL, scaling = NULL, 
+    yesYVal = NULL) 
+predict(towerObj, newx, k = 1) 
+```
+
+The main arguments are: 
+
+* **data**: The training set, a data frame or equivalent.
+
+* **yName**: Name of the column containing "Y", the variable to be
+  predicted.
+
+* **regFtnName**: Name of the regression model, currently 'lm', 'glm' or
+  'towerKNN'.
+
+* **towerObj**: Object of class "tower" returned by **makeTower()**.
+
+* **newx**: The X data to be predicted (one or more new cases).
+
+* **k**, The number of nearest neighbors. 
+
+The argument **k** is a tuning parameter chosen by the analyst.  
+
+## Example:  Vocabulary acquisition
+
+This data is from the [Stanford University Wordbank
+project](http://wordbank.stanford.edu).  The data, **english**, is
+included in the <strong>toweranNA</strong> package.  Of the
+non-administrative variables, e.g. excluding 'Language', which is always
+English in this data, about 43 percent of the values are missing.  
+
+To illustrate how fitting and prediction occur, let's apply Tower to fit
+the data and predict Y for the cases having missing values.  We will
+take age and gender as predictors.
+
+``` r
+data(english)
+
+names(english)
+#  [1] "data_id"     "age"         "language"    "form"        "birth_order"
+#  [6] "ethnicity"   "sex"         "mom_ed"      "measure"     "vocab"      
+# [11] "demo"        "n"           "demo_label" 
+
+# omit administrative variables
+engl1 <- english[,c(2,5:8,10)]
+
+head(engl1)
+#  age birth_order ethnicity    sex         mom_ed vocab
+# 1  24       First     Asian Female       Graduate   337
+# 2  19      Second     Black Female        College   384
+# 3  24       First     Other   Male Some Secondary    76
+# 4  18       First     White   Male      Secondary    19
+# 5  24       First     White Female      Secondary   480
+# 6  19       First     Other Female   Some College   313
+
+# many MVs
+sum(is.na(engl1))
+# [1] 9649
+# most MVs are near the end
+tail(engl1)
+#      age birth_order ethnicity    sex mom_ed vocab
+# 5493  28        <NA>      <NA>   Male   <NA>   352
+# 5494  28        <NA>      <NA> Female   <NA>   460
+# 5495  28        <NA>      <NA>   Male   <NA>   292
+# 5496  28        <NA>      <NA> Female   <NA>   661
+# 5497  28        <NA>      <NA> Female   <NA>   550
+# 5498  28        <NA>      <NA>   Male   <NA>   549
+
+#fit linear model for predictingt vocabulary size
+towerOut <- makeTower(engl1,'vocab','lm')
+```
+
+Say we wish to predict a new case like the child in row 5, but who is
+second in birth order, and for whom gender and mother's education are
+missing.
+
+``` r
+newx <- engl1[5,-6]
+newx$birth_order <- 'Second'
+newx$sex <- NA
+newx$mom_ed <- NA
+predict(towerOut,newx)
+# [1] 261.9361
+```
+
+# toweranNA: A Method Based on Regression Averaging
+
+*Setting:*  We have a dataset in which one of the columns, Y, is to be
+predicted in the future.  The remaining columns, collectively referred
+to as X, are the predictor variables/features.  Y can be either numeric
+or an R factor.
+
+Most of the MV literature concerns estimation of some relationship,  say
+comparison of means, analysis of linear regression coefficients and the
+like.  One applies some MV method to the original data, obtaining a
+"filled-in" version of the data. (or several such versions).  One then
+does one's statistical analysis on the new version.
+
+By constrast, our emphasis here is on **PREDICTION**, especially
+relevant in our AI era.  The main contribution of this package is a
+technique that we call the Tower Method, which is **directly aimed at
+prediction**. It is nonimputational, i.e. we do not make guesses as to
+the missing values in X.
 
 Note carefully:
 
@@ -50,89 +158,20 @@ prediction of Y.
 * The term *regression function* does not necessarily imply a linear
   model.  It could also be, say, a logistic model, random forests, etc.
 
-# Usage
+## Vocabulary data example
 
-The main call form is
+Consider the above illustration, in which we wished to predict a new
+case in which gender and mother's educational level were missed.  Then
+our prediction might be the estimated value of the regression function
+of wage on age, birth order and ethnicity, i.e. the *marginal
+regression function* of wage on that set of variables.
 
-``` r
-toweranNA(x, fittedReg, k, newx) 
-```
-
-where the arguments are: 
-
-* **x**: The X data for the intact rows in the training set. 
-
-* **fittedReg**: The vector of previously fitted regression function values,
-i.e. estimated E(Y | X), parameter or nonparametric, over that set. 
-
-* **k**, The number of nearest neighbors. 
-
-* **newx**: The X data to be predicted.  
-
-The number of neighbors is of course a tuning parameter chosen by the
-analyst.  Since we are averaging fitted regression estimates, which are
-by definition already smoothed, a small value of **k** should work well.  
-
-## Example:  Vocabulary acquisition
-
-This data is from the [Stanford University Wordbank project](http://wordbank.stanford.edu).  The data,
-**english**, is included in the <strong>toweranNA</strong> package
-(inherited from the included **regtools** package).  Of
-the non-administrative variables, e.g. excluding 'Language', which is
-always English in this data, about 43 percent of the values are missing.
-To illustrate how fitting and prediction occur, let's fit to the intact
-observations and then predict Y for the cases having missing values:
-
-``` r
-data(english,package='regtools')
-# for simplicity:
-english1 <- english[,c('age','sex','vocab')]
-head(english1)
-# age    sex vocab
-#  24 Female   337
-#  19 Female   384
-#  24   Male    76
-#  18   Male    19
-#  24 Female   480
-#  19 Female   313
-
-# make numeric for near neighbor compa
-english1$sex <- as.integer(english1$sex == 'Female')
-
-# get the intact rows, fit reg model
-eng1 <- na.exclude(english1)
-lmout <- lm(vocab ~ .,eng1)
-fittedValues <- lmout$fitted.values
-
-# predict vocab for a new case, age 28, female, 5 near neighbors
-newx <- data.frame(age=28,sex=1)
-toweranNA(eng1,fittedValues,5,newx,scaleX=FALSE)
-# outputs 490.7388
-newx <- data.frame(age=NA,sex=1)
-toweranNA(eng1,fittedValues,5,newx,scaleX=FALSE)
-# 400.2152
-newx <- data.frame(age=28,sex=NA)
-toweranNA(eng1,fittedValues,5,newx,scaleX=FALSE)
-# 474.8641
-
-```
-
-# toweranNA: A Method Based on Regression Averaging
-
-## Motivating example
-
-Consider a Census dataset on programmer and engineer Wage, with
-predictors Age, Education, Occupation, Gender and Weeks Worked. Say we
-need to predict a case in which age and gender are missing.  Then our
-prediction might be the estimated value of the regression function of
-wage on Education, Occupation and Weeks Worked, i.e. the *marginal
-regression function* of wage on those variables.
-
-Since each new case to be predicted will likely have a different
-pattern of which variables are missing, we would need to estimate many
-(potentially 2<sup>p</sup>) marginal regression functions. This would
-in many applications be computationally infeasible, as each marginal
-model would need to be fitted and run through diagnostic plots,
+Since each new case to be predicted will likely have a different pattern
+of which variables are missing, we would need to estimate many
+(potentially 2<sup>5</sup> = 32) marginal regression functions.  For
+datasets with p predictors, 2<sup>p</sup> of these would be needed.
+This would in many applications be computationally infeasible, as each
+marginal model would need to be fitted and run through diagnostic plots,
 hyperparameter investigation, and the like.
 
 **But the Tower Property provides an alternative.**  It tells us that **we can
@@ -140,14 +179,14 @@ obtain the marginal regression functions from the full one.**
 
 ## The Tower Property
 
-There is a theorem in abstract probability theory, that says for 
+There is a theorem in abstract probability theory that says for 
 random variables Y, U and V, 
 
 ``` 
    E[ E(Y|U,V) | U ] = E(Y | U) 
 ``` 
 
-Though abstract, it is intuitive.  Say Y, U and V above are Wage,
+Though abstract, it is intuitive.  Say Y, U and V are Wage,
 Gender and Occupation.  E(Y|U,V) is the mean wage among all workers 
 of a given gender, in a given occupation.  If we average that quantity
 over men and women, but still keep occupation fixed, we obtain the mean
@@ -158,15 +197,15 @@ function of Y on U and V, and average it over V for fixed U, we get the
 regression function of Y on U.  If V is missing but U is known, this is
 very useful, as we will now explain.  
 
-## How it solves our problem:
+## How it solves our problem
 
-In the example above, for a new case in which Education,
-Occupation and Weeks Worked are known while Age and Gender are missing,
+In our vocabulary example above, for a new case in which age, birth
+order and  ethnicity for whom gender and mother's education are missing.
 we would have
 
 ```
-U  = (Education,Occupation,Weeks Worked)
-V = (Age,Gender)
+U  = (age, birth order, ethnicity)
+V = (gender,mom_ed)
 ```
 
 E(Y|U) is the target marginal regression function that we wish to
@@ -175,15 +214,18 @@ Property implies that we can obtain that estimate by the averaging
 process described above.
 
 Specifically, we fit the full model to the complete cases in the data,
-then average that model over all data points whose values for Education,
-Occupation and Weeks Worked match those in the new case to be predicted.
-Thus only the full model need be estimated, rather than 2<sup>p</sup>
-models.
+then average that model over all data points whose values for which the
+values of age, birth order and ethnicity match those in the new case to
+be predicted.  Thus only the full model need be estimated, rather than
+2<sup>p</sup> models.
 
 Our function **toweranNA()** ("tower analysis with NAs") takes this
 approach.  Usually, there may not be many data points having the exact
 value specified for U, if any, so we average over a neighborhood of
 points near that value.  
+
+Since we are averaging fitted regression estimates, which are
+by definition already smoothed, a small value of **k** should work well.  
 
 Moreover, an early *Biometrika* paper by one of us (summarized in
 (Matloff, 2017, Sec. 7.5)) showed that regression averaging improves
