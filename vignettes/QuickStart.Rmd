@@ -298,8 +298,12 @@ On the other hand, some remedies are possible:
 
 Thus **Amelia**, **mice** etc. could be "Tower-ized".  They would not
 have the central focus on Y that Tower has, but reasonable **predict()**
-methods could be developed for them via Tower-ization.  This will make
-an interesting avenue for future research.
+methods could be developed for them via Tower-ization.  
+
+Intuition might suggest that such an approach may be less accurate in
+predicting Y, as the MI algorithms are in essence devoting the data
+resources to predicting all columns simultaneously.  This would make an
+interesting avenue for research.
 
 Also, what about regression functions and packages that do focus on
 predicting Y and do allow missing X values in the training data?  
