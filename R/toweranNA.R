@@ -102,7 +102,10 @@ predict.tower <- function(towerObj,newx,k=1)
    scaling <- towerObj$scaling
    saveXfactorInfo <- towerObj$saveXfactorInfo
 
-   if (is.vector(newx)) newx <- matrix(newx,nrow=1)
+   if (is.vector(newx)) {
+      newx <- matrix(newx,nrow=1)
+      colnames(newx) <- names(towerOut$saveXfactorInfo)
+   }
 
    # method cannot predict a newx row consisting of all NAs
    allNA <- function(w) all(is.na(w))
