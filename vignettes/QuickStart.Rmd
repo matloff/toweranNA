@@ -273,12 +273,15 @@ loosely autoregressive, with each time point predicted from the previous
 
 # Assumptions
 
-Compared to the widely-used  packages **Amelia** and **mice**,
-**toweranNA** has far less restrictive assumptions.  E.g. **Amelia**
-assumes multivariate normality of the X vector, an assumption not even
-approximately met when some components of X are categorical variables.
-Both of those packages make the standard Missing at Random (MAR)
-assumption.
+Compared to most MV packages, **toweranNA** has far less restrictive
+assumptions.  E.g. **Amelia** assumes multivariate normality of the X
+vector, an assumption not even approximately met when some components of
+X are categorical variables.  The **mice** package has extensive
+features for handling such cases, but there are still attendant
+assumptions involved.
+
+Both of those packages, and most others, make the standard
+Missing at Random (MAR) assumption.  What about Tower?
 
 In our Tower Method, the assumption involves Y:
 
@@ -289,8 +292,9 @@ V are missing.
 
 This assumption is neither implies nor is implied by MAR, but it is
 similar to that condition.  As with MAR, this assumption is not
-verifiable, and thus we must simply ask, ``Does it work?'', meaning
-looking at how well it predicts new cases.
+verifiable, and thus we must simply ask, "Does it work?", meaning
+how well does it predicts new cases?  And *that* is verifiable, via
+cross-validation.
 
 
 # Reference
