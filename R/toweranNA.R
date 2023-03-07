@@ -166,24 +166,6 @@ predict.tower <- function(towerObj,newx,k=1)
    preds
 }
 
-###########################  towerLM()  ###############################
-
-# wrapper for toweranNA() in lm() case; here x is a data matrix of X, y
-# is Y; useGLM() means glm instead of lm(); other args as in toweranNA()
-
-towerLM <- function(x,y,k,newx,useGLM=FALSE,scaleX=FALSE,noisy=TRUE) {
-   if(scaleX) 
-      x <- scale(x) 
-   ccs <- complete.cases(cbind(x,y))
-   if(noisy) cat(sum(ccs), 'complete cases out of n =', nrow(x),'observations.\n')
-   xcc <- as.data.frame(x[ccs,])
-   ycc <- y[ccs]
-   if(noisy) cat("fitting model...\n")
-   est <- if(useGLM) glm(ycc ~ ., data=xcc, family=binomial) else lm(ycc ~ ., data=xcc)
-   if(noisy) cat("Calling toweranNA() for", k, "nearest neighbors with", 
-                 if(useGLM) "generalized linear model" else "linear model", "estimates.")
-   toweranNA(xcc,est$fitted.values,k,newx,scaleX)
-}
 
 
 ############################  towerTS  ###############################
@@ -193,7 +175,7 @@ towerLM <- function(x,y,k,newx,useGLM=FALSE,scaleX=FALSE,noisy=TRUE) {
 # 'naIdxs' records the indices of the predicted elements (some will be
 # NA)
 
-towerTS <- function(xts,lag,k) {
+towerTS <- function(xts,lag,k,regFtnName='lm') {
    xy <- TStoX(xts,lag)
    l1 <- lag + 1
    x <- xy[,-l1]; y <- xy[,l1]

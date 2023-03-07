@@ -2,7 +2,6 @@
 export(makeTower)
 export(countnas)
 export(checkConstCols)
-export(towerLM)
 export(towerTS)
 importFrom(stats,lm)
 importFrom(stats,glm)
