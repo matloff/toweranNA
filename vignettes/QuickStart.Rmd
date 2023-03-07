@@ -271,6 +271,43 @@ series, minus the first 10 observations.  So, the call to **lm()** is
 loosely autoregressive, with each time point predicted from the previous
 10.
 
+# Could Other MV Packages Do Prediction?
+
+Could a **predict()** method be added to packages like **Amelia** and 
+**mice**?
+
+The answer on one level is no.  The multiple imputation (MI) algorithms
+they use are designed solely to "fill in the blanks" in the training
+data.  There is nothing in the algorithms on dealing with MVs in new
+cases.
+
+On the other hand, some remedies are possible:
+
+* Each time we are presented with a new case having MVs, we could add it to the
+  original training data, with Y also treated as an MV.  We could then
+  rerun the MI algorithm, and the filled-in spot for the new Y would
+  be our predicted value.  (With multiple imputations, we could, say,
+  take the mean of the filled-in Ys.  Of course, this would have the
+  drawback of entailing large increases in computation.
+
+* Each time we are presented with a new case having MVs, we could find
+  the nearest filled-in row in the training set, and take its Y value as
+  our prediction for the new case.  (Or look at k near neighbors and
+  average their Ys.)  As we do here with Tower, distances would be
+  calculated on the basis of the intact values in the new case.
+
+Thus **Amelia**, **mice** etc. could be "Tower-ized".  They would not
+have the central focus on Y that Tower has, but reasonable **predict()**
+methods could be developed for them via Tower-ization.  This will make
+an interesting avenue for future research.
+
+Also, what about regression functions and packages that do focus on
+predicting Y and do allow missing X values in the training data?  
+Random forests packages such as **randomForest** and **grf** come to
+mind.  But again, these tolerate MVs at the training stage but not in
+new cases.
+
+
 # Assumptions
 
 Compared to most MV packages, **toweranNA** has far less restrictive
