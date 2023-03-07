@@ -179,15 +179,17 @@ towerTS <- function(xts,lag,k,regFtnName='lm') {
    xy <- TStoX(xts,lag)
    l1 <- lag + 1
    x <- xy[,-l1]; y <- xy[,l1]
+   xy <- as.data.frame(xy)
+   yName <- paste0('V',ncol(xy))
+   twout <- makeTower(xy,yName,regFtnName)
    NAs.orig <- which(is.na(xts))
    # can't predict before time lag+1
-   NAs <- NAs.orig[NAs.orig > lag]
+   # NAs <- NAs.orig[NAs.orig > lag]
+   nx <- length(x)
+   newx <- x[(nx-lag+1):nx]
    # adjust for shifted indexing
-   newx <- x[NAs-lag,]
-   preds <- towerLM(x,y,k,newx,FALSE)
-   NAsSkipped <- NAs.orig[NAs.orig <= lag]
-   firstpreds <- rep(NA,length(NAsSkipped))
-   preds <- c(firstpreds,preds)
+   # newx <- x[NAs-lag,]
+   preds <- predict(twout,newx)
    list(preds = preds, naIdxs = NAs.orig)
 }
 
