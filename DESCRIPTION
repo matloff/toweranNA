@@ -6,8 +6,8 @@ Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu", role = 
 Maintainer: Norm Matloff <matloff@cs.ucdavis.edu>
 Depends: R (>= 3.6.0)
 Suggests: knitr
-Imports: FNN, pdist, regtools, stats
 VignetteBuilder: knitr
+Imports: FNN, pdist, regtools, stats
 License: GPL (>= 2)
 Description: Non-imputational method for handling missing values in 
    a prediction context.
