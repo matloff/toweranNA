@@ -93,17 +93,17 @@ makeTower <-
    returnObj
 }
 
-predict.tower <- function(towerObj,newx,k=1)
+predict.tower <- function(object,newx,k=1)
 {
-   x <- towerObj$x
-   fittedReg <- towerObj$fittedReg
-   multiclass <- towerObj$multiclass
-   scaling <- towerObj$scaling
-   saveXfactorInfo <- towerObj$saveXfactorInfo
+   x <- object$x
+   fittedReg <- object$fittedReg
+   multiclass <- object$multiclass
+   scaling <- object$scaling
+   saveXfactorInfo <- object$saveXfactorInfo
 
    if (is.vector(newx)) {
       newx <- matrix(newx,nrow=1)
-      colnames(newx) <- names(towerObj$saveXfactorInfo)
+      colnames(newx) <- names(object$saveXfactorInfo)
    } else if (is.data.frame(newx)) {
       newx <- regtools::factorsToDummies(newx,omitLast=TRUE,
          factorsInfo=saveXfactorInfo)
@@ -269,7 +269,7 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
     if (is.null(savedNhbrs)) {
         tmp <- FNN::get.knnx(data = x, query = newx, k = kmax1)
     }
-closestIdxs <- tmp$nn.index[, 1:(kmax + leave1out), drop = FALSE]
+    closestIdxs <- tmp$nn.index[, 1:(kmax + leave1out), drop = FALSE]
     if (leave1out)
         closestIdxs <- closestIdxs[, -1, drop = FALSE]
     if (kmax1 == 1) {
