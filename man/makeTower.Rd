@@ -1,30 +1,25 @@
-\name{toweranNA}
-\alias{toweranNA}
-\title{
-does prediction using the Tower Method to deal with NAs
-}
-\description{
-In the case of regression or a 2-class classification problem,
-'fittedReg' will be the estimated regression function, evaluated at x; 
-e.g. the compoment 'fitted.values' from lm() output.
-
-For a multiclass classification problem, 'fittedReg' will be a matrix,
-with number of columns equal to number of classes, and number of rows
-equal to that of 'newx'; the (i,j) element will be the estimated
-conditional probability of that class, given row i of x.
-
-The purpose of scaling x and newx is that the k-NN ops will be better
-if all the predictor variables are commensurate
+\name{makeTower}
+\alias{makeTower}
+\title{Nonimputational method for dealing with NA values in prediction
+application}
+\description{In a prediction application, the intended regression model
+is applied to complete cases, from which marginal regression models can
+be derived for predicting new cases with arbitrary NA patterns.
 }
 \usage{
-toweranNA(x,fittedReg,k=1,newx,scaleX=TRUE)
+makeTower(data,yName,regFtnName,scaling=NULL,yesYVal=NULL)
 }
 \arguments{
-  \item{x}{matrix/data frame of "X" values, numeric, all complete cases.}
-  \item{fittedReg}{fitted regression values} 
+  \item{data}{Data frame or equivalent..}
+  \item{yName}{Name of the column in \code{data} to be predicte to be
+     predicted.} 
+  \item{regFtnName}{Regression model to be used, currently 'lm', 'glm'
+     (\code{family=binomial}), or 'towerKNN'.}
+  \item{opts}{Options for \code{regFtnName}, a quoted string with 
+     separating commas.}
   \item{k}{number of nearest neighbors}
-  \item{scaleX}{Scale x and newx before prediction? Default: TRUE.}
-  \item{newx}{matrix/data frame of new "X" values}
+  \item{scale}{Scaling to be applied to x and newx. Default NULL
+     means no scaling.}
 
 }
 

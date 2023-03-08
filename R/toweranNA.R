@@ -14,9 +14,6 @@
 #    regFtnName:  current choices are 'lm','glm' (with family=binomial),
 #       and towerKNN (modified from regtools package)
 
-#    opts: optional arguments for the call to the regression function;
-#       in the form of a string, e.g. 'a=3,b=8'
-
 #    scaling: if not NULL, scaling will be done on "X", using 'scale' 
 
 #    yesYVal: in dichotomous case, which value should be coded as 1
@@ -28,7 +25,7 @@
 # matter which regression model is used
 
 makeTower <- 
-   function(data,yName,regFtnName,opts=NULL,scaling=NULL,yesYVal=NULL) 
+   function(data,yName,regFtnName,scaling=NULL,yesYVal=NULL) 
 {
    yCol <- which(names(data) == yName)
    x <- data[,-yCol]

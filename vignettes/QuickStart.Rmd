@@ -50,7 +50,7 @@ by calling **predict()** on that object.
 The call forms are: 
 
 ``` r
-makeTower(data, yName, regFtnName, opts = NULL, scaling = NULL, 
+makeTower(data, yName, regFtnName, scaling = NULL, 
     yesYVal = NULL) 
 predict(towerObj, newx, k = 1) 
 ```
