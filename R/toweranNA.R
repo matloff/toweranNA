@@ -173,9 +173,8 @@ predict.tower <- function(towerObj,newx,k=1)
 ############################  towerTS  ###############################
 
 # Tower for time series; fits linear model to lagged elements; k is the
-# number of nearest neighbors; predicts only the missing; the component
-# 'naIdxs' records the indices of the predicted elements (some will be
-# NA)
+# number of nearest neighbors; predicts the next element after the end
+# of xts
 
 towerTS <- function(xts,lag,k,regFtnName='lm') {
    xy <- TStoX(xts,lag)
@@ -188,8 +187,7 @@ towerTS <- function(xts,lag,k,regFtnName='lm') {
    newx <- xts[(nx-lag+1):nx]
    # adjust for shifted indexing
    # newx <- x[NAs-lag,]
-   preds <- predict(twout,newx)
-   list(preds = preds, naIdxs = NAs.orig)
+   predict(twout,newx)
 }
 
 #############################  towerKNN  ################################
