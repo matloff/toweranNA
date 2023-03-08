@@ -3,7 +3,7 @@ Title: A Method for Handling Missing Values in Prediction Applications
 Version: 0.1.0
 Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")),
            person("Pete", "Mohanty", email = "pete.mohanty@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0001-8531-3345")))
-Maintainer: Norm Matloff <matloff@cs.ucdavis.edu>
+Maintainer: Norm Matloff <nsmatloff@ucdavis.edu>
 Depends: R (>= 3.6.0)
 Suggests: knitr
 VignetteBuilder: knitr
@@ -15,5 +15,4 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/matloff/toweranNA
 BugReports: https://github.com/matloff/toweranNA/issues
-Maintainer: Norm Matloff <nsmatloff@ucdavis.edu>
 NeedsCompilation: no
