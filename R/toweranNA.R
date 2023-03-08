@@ -39,7 +39,8 @@ makeTower <-
 
    # get complete cases
    origX <- x
-   ccs <- which(complete.cases(x))
+   # ccs <- which(complete.cases(x))
+   ccs <- which(complete.cases(data))
    x <- x[ccs,]
    y <- y[ccs]
 
@@ -74,12 +75,13 @@ makeTower <-
    # fit the regression model
    if (multiclass && regFtnName != 'towerKNN')
       stop('only towerKNN set up for multiclass case for now')
+   dataccs <- data[ccs,]
    if (regFtnName == 'lm') {
-      ftnCall <- sprintf('lm(%s ~ .,data)',yName)
+      ftnCall <- sprintf('lm(%s ~ .,dataccs)',yName)
       tmp <- evalr(ftnCall)
       fittedReg <- tmp$fitted.values
    } else if (regFtnName == 'glm') {
-      ftnCall <- sprintf('glm(%s ~ .,data,family=binomial)',yName)
+      ftnCall <- sprintf('glm(%s ~ .,dataccs,family=binomial)',yName)
       tmp <- evalr(ftnCall)
       fittedReg <- tmp$fitted.values
    } else if (regFtnName == 'towerKNN') {
@@ -185,8 +187,8 @@ towerTS <- function(xts,lag,k,regFtnName='lm') {
    NAs.orig <- which(is.na(xts))
    # can't predict before time lag+1
    # NAs <- NAs.orig[NAs.orig > lag]
-   nx <- length(x)
-   newx <- x[(nx-lag+1):nx]
+   nx <- length(xts)
+   newx <- xts[(nx-lag+1):nx]
    # adjust for shifted indexing
    # newx <- x[NAs-lag,]
    preds <- predict(twout,newx)
