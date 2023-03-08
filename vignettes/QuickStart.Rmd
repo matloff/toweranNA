@@ -18,7 +18,7 @@ specifically for **prediction applications.**
 
 <br> 
 
-(This work was performed prior to PM's joining Google, and is connected
+(This work was performed prior to PM's joining Google, and is not connected
 to Google in any manner.)
 
 
