@@ -184,9 +184,6 @@ towerTS <- function(xts,lag,k,regFtnName='lm') {
    xy <- as.data.frame(xy)
    yName <- paste0('V',ncol(xy))
    twout <- makeTower(xy,yName,regFtnName)
-   NAs.orig <- which(is.na(xts))
-   # can't predict before time lag+1
-   # NAs <- NAs.orig[NAs.orig > lag]
    nx <- length(xts)
    newx <- xts[(nx-lag+1):nx]
    # adjust for shifted indexing
