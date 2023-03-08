@@ -247,29 +247,20 @@ data(gold,package='forecast')
 gold[1099:1108]
 # [1] 395.30 394.10 393.40 396.00     NA     NA 391.25 383.30 384.00 382.30
 ```
-Let's predict the 1109th data point, using the Tower Method:
+
+Currently only the next element after the end of the series is predicted.
+Let's predict the 1109th data point:
 
 ``` r
-gx <- regtools::TStoX(gold,10)
-dim(gx)
-# 1098   11
-# row i contains gx[i], gx[i+1,...,gx[i+10]
-gxd <- as.data.frame(gx)
-twout <- makeTower(gxd,'V11','lm') 
-x1109 <- gold[1099:1108]  # X for predicting gold[1109] 
-x1109 <- matrix(x1109,nrow=1)
-colnames(x1109) <- colnames(gxd[,-11])
-predict(twout,x1109) 
-# 393.8496
+towerTS(gold,5,1)  # lag 5, k = 1, 'lm' etc.
+# 385.2088
 ```
 
-The function **TStoX()**, which the package imports from **regtools**,
-transforms the data to an 11-column matrix, designed for analysis of lag 10.  
-In each row of **gx**, we see a value in column 11, preceded in the
-row by the 10 most recent points.  That 11th column is the original time
-series, minus the first 10 observations.  So, the call to **lm()** is
+Internallly, the function **regtools::TStoX()** transforms the data to
+an 6-column matrix, designed for analysis of lag 5.  Column 6 then
+becomes Y, with columns 1:5 being X.  So, the call to **lm()** is
 loosely autoregressive, with each time point predicted from the previous
-10.
+5.
 
 # Could Other MV Packages Do Prediction?
 
