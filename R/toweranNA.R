@@ -212,9 +212,9 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
         stop("PCA now must be done separately")
     if (allK)
         stop("allK option currenttly disabled")
-    if (identical(smoothingFtn, loclin) && kmax < 3)
+    if (identical(smoothingFtn, regtools::loclin) && kmax < 3)
         stop("loclin requires k >= 3")
-    if (identical(smoothingFtn, vary) && kmax < 2)
+    if (identical(smoothingFtn, regtools::vary) && kmax < 2)
         stop("vary requires k >= 2")
     noPreds <- is.null(newx)
     # startA1adjust <- if (startAt1) 
@@ -222,11 +222,11 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
     # else 1
     if (is.vector(x))
         x <- matrix(x, ncol = 1)
-    if (hasFactors(x))
+    if (regtools::hasFactors(x))
         stop("use factorsToDummies() to create dummies")
     if (is.data.frame(x))
         x <- as.matrix(x)
-    ccout <- constCols(x)
+    ccout <- regtools::constCols(x)
     if (length(ccout) > 0) {
         warning("X data has constant columns:")
         print(ccout)
@@ -237,10 +237,10 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
     if (!is.vector(y) && !is.matrix(y))
         stop("y must be vector or matrix")
     if (identical(smoothingFtn, mean))
-        smoothingFtn <- meany
+        smoothingFtn <- regtools::meany
     if (ncol(y) > 1 && !allK)
         classif <- TRUE
-    if (is.factor(newx) || is.data.frame(newx) && hasFactors(newx))
+    if (is.factor(newx) || is.data.frame(newx) && regtools::hasFactors(newx))
         stop("change to dummies, factorsToDummies()")
     if (is.vector(newx)) {
         nms <- names(newx)
@@ -256,9 +256,9 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
         newx <- x
     kmax1 <- kmax + leave1out
     if (scaleX) {
-        x <- mmscale(x)
+        x <- regtools::mmscale(x)
         xminmax <- attr(x, "minmax")
-        newx <- mmscale(newx, scalePars = xminmax)
+        newx <- regtools::mmscale(newx, scalePars = xminmax)
     }
     else xminmax <- NULL
     eVars <- !is.null(expandVars)
@@ -266,8 +266,8 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
     if (eVars || eVals) {
         if (length(expandVars) != length(expandVals))
             stop("expandVars and expandVals must have the same length")
-        x <- multCols(x, expandVars, expandVals)
-        newx <- multCols(newx, expandVars, expandVals)
+        x <- regtools::multCols(x, expandVars, expandVals)
+        newx <- regtools::multCols(newx, expandVars, expandVals)
     }
     if (is.null(savedNhbrs)) {
         tmp <- FNN::get.knnx(data = x, query = newx, k = kmax1)
@@ -291,8 +291,8 @@ closestIdxs <- tmp$nn.index[, 1:(kmax + leave1out), drop = FALSE]
         tmp
     else NULL
     meanx <- colMeans(x)
-    covx <- cov(x)
-    tried <- try(tmplist$mhdists <- mahalanobis(newx, meanx,
+    covx <- stats::cov(x)
+    tried <- try(tmplist$mhdists <- regtools::mahalanobis(newx, meanx,
         covx), silent = TRUE)
     if (is.null(tried) || inherits(tried, "try-error")) {
         tmplist$mhdists <- NULL
@@ -319,4 +319,12 @@ closestIdxs <- tmp$nn.index[, 1:(kmax + leave1out), drop = FALSE]
     class(tmplist) <- "towerKNN"
     tmplist
 }
+
+############################  evalr  ################################
+
+# execute the given R expression
+evalr <- function(toexec) {
+   eval(parse(text=toexec),parent.frame())
+}
+
 

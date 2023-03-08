@@ -1,10 +1,10 @@
 Package: toweranNA
 Title: A Method for Handling Missing Values in Prediction Applications
 Version: 0.1.0
-Authors@R: c(person("Norm", "Matloff", email = "matloff@cs.ucdavis.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")),
+Authors@R: c(person("Norm", "Matloff", email = "nsmatloff@ucdavis.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")),
            person("Pete", "Mohanty", email = "pete.mohanty@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0001-8531-3345")))
 Maintainer: Norm Matloff <nsmatloff@ucdavis.edu>
-Depends: R (>= 3.6.0)
+Depends: R (>= 3.6.0),regtools (>= 0.8.0),rmarkdown
 Suggests: knitr
 VignetteBuilder: knitr
 Imports: FNN, pdist, regtools, stats
