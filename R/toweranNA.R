@@ -131,7 +131,7 @@ predict.tower <- function(towerObj,newx,k=1)
 
       rw <- newx[i,]
 
-      # restrict to non-NA elements
+      # restrict rw to non-NA elements
       intactCols <- which(!is.na(rw))
       ic <- intactCols
       rw <- rw[ic]
@@ -145,18 +145,7 @@ predict.tower <- function(towerObj,newx,k=1)
 
       # find neighbors; nni will be the index/indices in x of the near
       # neigbors
-      if (k == 1) {
-         tmp <- pdist(rwm[1,],x[,ic])@dist
-         nni <- which.min(tmp)
-      } else {
-         xic <- x[,ic,drop=FALSE]
-         if (k > nrow(xic)) {
-            kThisTime <- nrow(xic)
-            warning('too few intact neigbors, temp reduced k')
-         } else kThisTime <- k
-         tmp <- get.knnx(data = xic,query = rwm, k = kThisTime)
-         nni <- tmp$nn.index
-      }
+      nni <- nearNeighborIndices(rwm,x,ic,k)
 
       if (!multiclass) {
          preds[i] <- mean(fittedReg[nni])
@@ -166,6 +155,25 @@ predict.tower <- function(towerObj,newx,k=1)
    }
    
    preds
+}
+
+nearNeighborIndices <- function(rwm,x,ic,k) 
+{
+   if (k == 1) {
+       tmp <- pdist(rwm[1,],x[,ic])@dist
+       nni <- which.min(tmp)
+    } else {
+       xic <- x[,ic,drop=FALSE]
+       if (k > nrow(xic)) {
+          kThisTime <- nrow(xic)
+          warning('too few intact neigbors, temp reduced k')
+       } else kThisTime <- k
+       tmp <- get.knnx(data = xic,query = rwm, k = kThisTime)
+       nni <- tmp$nn.index
+    }
+
+    nni
+
 }
 
 
@@ -226,12 +234,6 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
         x <- x[, -ccout]
     }
     else ccout <- NULL
-#     nYvals <- length(unique(y))
-#     if (is.vector(y)) {
-#         if (classif && nYvals > 2) 
-#             y <- factorsToDummies(as.factor(y), omitLast = FALSE)
-#         else y <- matrix(y, ncol = 1)
-#     }
     if (!is.vector(y) && !is.matrix(y))
         stop("y must be vector or matrix")
     if (identical(smoothingFtn, mean))
