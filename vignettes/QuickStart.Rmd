@@ -16,6 +16,13 @@ specifically for **prediction applications.**
 
 *Norm Matloff (UC Davis) and Pete Mohanty (Google)*
 
+<br> 
+
+(This work was performed prior to PM's joining Google, and is connected
+to Google in any manner.)
+
+
+
 <br>
 <br>
 
