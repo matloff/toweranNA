@@ -290,7 +290,7 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
     else NULL
     meanx <- colMeans(x)
     covx <- stats::cov(x)
-    tried <- try(tmplist$mhdists <- regtools::mahalanobis(newx, meanx,
+    tried <- try(tmplist$mhdists <- mahalanobis(newx, meanx,
         covx), silent = TRUE)
     if (is.null(tried) || inherits(tried, "try-error")) {
         tmplist$mhdists <- NULL

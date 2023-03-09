@@ -1,7 +1,5 @@
 
 export(makeTower)
-export(countnas)
-export(checkConstCols)
 export(towerTS)
 import('rmarkdown')
 importFrom(stats,lm)
@@ -11,7 +9,7 @@ importFrom(stats,complete.cases)
 importFrom(pdist,pdist)
 importFrom(FNN,get.knnx)
 importFrom(regtools,TStoX)
-importFrom(regtools,mahalanobis)
+importFrom(stats,mahalanobis)
 importFrom(regtools,factorToDummies)
 importFrom(regtools,factorsToDummies)
 
