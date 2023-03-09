@@ -128,11 +128,15 @@ missing.
 
 ``` r
 newx <- engl1[5,-6]
-newx$birth_order <- 'Second'
+newx$age <- 28
 newx$sex <- NA
 newx$mom_ed <- NA
+newx
+  age birth_order ethnicity sex mom_ed
+5  28       First     White  NA     NA
 predict(towerOut,newx)
-# [1] 261.9361
+
+# 496.9752
 ```
 
 # toweranNA: A Method Based on Regression Averaging
@@ -165,7 +169,7 @@ prediction of Y.
 * The term *regression function* does not necessarily imply a linear
   model.  It could also be, say, a logistic model, random forests, etc.
 
-## Vocabulary data example
+## Illustration via the vocabulary data example
 
 Consider the above illustration, in which we wished to predict a new
 case in which gender and mother's educational level were missed.  Then
@@ -237,6 +241,25 @@ well.
 Moreover, an early *Biometrika* paper by one of us (summarized in
 (Matloff, 2017, Sec. 7.5)) proved that regression averaging improves
 estimation of means, even with no MVs, thus an added bonus. 
+
+# Classification Applications
+
+Say we wish to predict whether the child has a vocabulary of more than
+100 words.  Dichotomous Y in the package must be an R factor, with the
+argument **yesYVal** specifying which level of the factor we wish to be
+considered the positive case.
+
+``` r
+engl2$vocab <- as.factor(engl2$vocab > 100)
+newx
+#   age birth_order ethnicity sex mom_ed
+# 5  24      Second     White  NA     NA
+towerOut <- makeTower(engl2,'vocab','glm',yesYVal='TRUE')
+predict(towerOut,newx)
+# 0.8604249  86% chance that this new child knows more than 100 words
+
+```
+
 
 # Application to Time Series
 
