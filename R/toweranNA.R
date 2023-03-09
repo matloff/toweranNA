@@ -65,7 +65,7 @@ makeTower <-
          y <- as.integer(y == yesYVal)
       } else {  # multiclass case
          y <- regtools::factorsToDummies(y,omitLast=FALSE)
-         saveYfactorInfo <- attr(x,'factorsInfo')
+         saveYfactorInfo <- attr(y,'factorsInfo')$dfr$fullLvls
       }
    }
 
@@ -151,6 +151,7 @@ predict.tower <- function(object,newx,k=1)
       }
    }
    
+   colnames(preds) <- object$saveYfactorInfo
    preds
 }
 
