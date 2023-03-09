@@ -256,9 +256,26 @@ newx
 # 5  24      Second     White  NA     NA
 towerOut <- makeTower(engl2,'vocab','glm',yesYVal='TRUE')
 predict(towerOut,newx)
-# 0.8604249  86% chance that this new child knows more than 100 words
+# 0.9833677 98% chance that this new child knows more than 100 words
+```
+
+Let's try predicting birth order.
+
+``` r
+newx <- engl1[5,-2]
+newx$age <- 28
+newx$mom_ed <- NA
+newx
+#   age ethnicity    sex mom_ed vocab
+# 5  28     White Female     NA   480
+predict(towerOut,newx)
+#      Eighth Fifth First Fourth Second Seventh Sixth Third
+# [1,]      0     0   0.6      0    0.2       0     0   0.2
 
 ```
+
+We estimate a 60% chance of First order, and 20% each of Second and
+Third.
 
 
 # Application to Time Series
