@@ -11,8 +11,11 @@
 #    yName: name of the column in 'data' for "Y"; the other columns form
 #    "X"; if "Y" is dichotomous or categorical
 
-#    regFtnName:  current choices are 'lm','glm' (with family=binomial),
+#    regFtnName: current choices are 'lm','glm' (with family=binomial),
 #       and towerKNN (modified from regtools package)
+
+#    opts: R list, specifying optional arguments of regFtnName, and
+#       their values; currently applies to towerKNN
 
 #    scaling: if not NULL, scaling will be done on "X", using 'scale' 
 
@@ -25,7 +28,7 @@
 # matter which regression model is used
 
 makeTower <- 
-   function(data,yName,regFtnName,scaling=NULL,yesYVal=NULL) 
+   function(data,yName,regFtnName,opts,scaling=NULL,yesYVal=NULL) 
 {
    yCol <- which(names(data) == yName)
    x <- data[,-yCol]
@@ -82,7 +85,14 @@ makeTower <-
       tmp <- evalr(ftnCall)
       fittedReg <- tmp$fitted.values
    } else if (regFtnName == 'towerKNN') {
-      fittedReg <- towerKNN(x,y,kmax=5)$regests
+      callOut <- 
+         if (is.null(opts)) {
+           towerKNN(x,y,kmax=5)
+         } else {
+           theCall <- buildCall('callOut <- towerKNN(x,y',opts)
+           evalr(theCall)
+         }
+      fittedReg <- callOut$regests
    } else stop('invalid regression model')
 
    # package it and done
@@ -174,8 +184,6 @@ nearNeighborIndices <- function(rwm,x,ic,k)
 
 }
 
-
-
 ############################  towerTS  ###############################
 
 # Tower for time series; fits linear model to lagged elements; k is the
@@ -234,10 +242,11 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
     else ccout <- NULL
     if (!is.vector(y) && !is.matrix(y))
         stop("y must be vector or matrix")
+    if (is.vector(y)) y <- matrix(y,ncol=1)
     if (identical(smoothingFtn, mean))
         smoothingFtn <- regtools::meany
-    if (ncol(y) > 1 && !allK)
-        classif <- TRUE
+    # if (ncol(y) > 1 && !allK)
+    #     classif <- TRUE
     if (is.factor(newx) || is.data.frame(newx) && regtools::hasFactors(newx))
         stop("change to dummies, factorsToDummies()")
     if (is.vector(newx)) {
@@ -318,11 +327,29 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
     tmplist
 }
 
+# utilities
+
 ############################  evalr  ################################
 
-# execute the given R expression
+# execute the given R expression; toexec is a string
 evalr <- function(toexec) {
    eval(parse(text=toexec),parent.frame())
 }
 
+############################  buildCall  ################################
+
+# adds specified optional arguments to function call; baseCall is the
+# partial call, to which we will add more args; opts is an R list of
+# options and values; string values must be double quoted, e.g. '"abc"'
+
+buildCall <- function(baseCall,opts) 
+{
+   for (i in 1:length(opts)) {
+      optName <- names(opts)[i]
+      optVal <- opts[[i]]
+      baseCall <- sprintf('%s,%s=%s',
+         baseCall,optName,optVal)
+   }
+   paste0(baseCall,')')
+}
 
