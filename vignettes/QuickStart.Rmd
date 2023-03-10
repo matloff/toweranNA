@@ -268,14 +268,14 @@ newx$mom_ed <- NA
 newx
 #   age ethnicity    sex mom_ed vocab
 # 5  28     White Female     NA   480
-towerOut <- makeTower(engl1,'birth_order','towerKNN')
+towerOut <- makeTower(engl1,'birth_order','towerKNN',opts=list(kmax=25))
 predict(towerOut,newx,10)
-#      Eighth Fifth First Fourth Second Seventh Sixth Third
-#           0     0  0.66      0   0.26       0     0  0.08
+#     Eighth Fifth First Fourth Second Seventh Sixth Third
+#          0 0.004 0.568      0   0.34       0     0 0.088
 ```
 
-We estimate a 66% chance of First order, and 26% and 8% for Second and
-Third.
+We estimate a 56.8% chance of First order, 34% for Second and
+so on
 
 
 # Application to Time Series
@@ -341,7 +341,8 @@ methods could be developed for them via Tower-ization.
 Intuition might suggest that such an approach may be less accurate in
 predicting Y, as the MI algorithms are in essence devoting the data
 resources to predicting all columns simultaneously.  This would make an
-interesting avenue for research.
+interesting avenue for research, and we will be adding Tower-ization .
+methods for **Amelia** etc.
 
 Also, what about regression functions and packages that do focus on
 predicting Y and do allow missing X values in the training data?  
