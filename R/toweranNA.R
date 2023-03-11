@@ -201,7 +201,7 @@ towerTS <- function(xts,lag,k,regFtnName='lm') {
    newx <- xts[(nx-lag+1):nx]
    # adjust for shifted indexing
    # newx <- x[NAs-lag,]
-   predict.tower(twout,newx)
+   predict.tower(twout,newx,k=k)
 }
 
 #############################  towerKNN  ################################
