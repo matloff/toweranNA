@@ -7,7 +7,7 @@ Tower for Times Series
 fits linear model to lagged elements; k is the number of nearest neighbors; predicts only the missing; the component 'naIdxs' records the indices of the predicted elements (some will be NA)
 }
 \usage{
-towerTS(xts, lag, k)
+towerTS(xts,lag,k,regFtnName='lm')
 }
 \arguments{
   \item{xts}{A matrix, data frame etc., with each column a time series, over a common time period}
