@@ -23,6 +23,9 @@ makeTower(data,yName,regFtnName,opts,scaling=NULL,yesYVal=NULL)
      means no scaling.}
   \item{yesYVal}{In the case of dichotomous Y, this specifies the level
      to be considered positive, i.e. for which Y will be 1.}
+  \item{object}{Object of type 'tower'.}
+  \item{newx}{New case(s) to be predicted, in the same format as in the
+  non-Y portion of \code{data}.}
 }
 
 \value{Object of class 'tower', to be used as input to
@@ -38,11 +41,12 @@ Pete Mohanty
 }
 
 \examples{
-# split off new data
+towerOut <- makeTower(mtcars,'mpg','lm')
+
 newx <- mtcars[-c(1:10),-1]
-# insert missing value in each of the first ten rows
 for(i in 1:10)
   newx[i, i] <- NA
+
 head(newx)
 #                     cyl  disp  hp drat    wt  qsec vs am gear carb
 # Merc 280C            NA 167.6 123 3.92 3.440 18.90  1  0    4    4
@@ -52,11 +56,9 @@ head(newx)
 # Cadillac Fleetwood    8 472.0 205 2.93    NA 17.98  0  0    3    4
 # Lincoln Continental   8 460.0 215 3.00 5.424    NA  0  0    3    4
  
-pred <- toweranNA(x=mtcars[1:10,-1],
-                  fittedReg=lm(mpg~., data=mtcars[1:10,])$coefficients, 
-                  k=3, 
-                  newx=newx)
-head(pred)
-#[1] -0.3051317  2.1920280  2.0616099  2.1920280  2.0616099  2.1920280
+predict(towerOut,newx,k=3)
+#  [1] 20.00086 15.17132 15.17132 15.17132 11.15469 11.15469 11.15469 28.52625
+#  [9] 29.06067 28.52625 24.72144 17.45622 16.75827 15.52077 14.95958 28.52625
+# [17] 25.34890 26.08506 15.52077 19.19484 15.37239 24.72144
 }
 

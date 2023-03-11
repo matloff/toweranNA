@@ -10,8 +10,10 @@ fits linear model to lagged elements; k is the number of nearest neighbors; pred
 towerTS(xts,lag,k,regFtnName='lm')
 }
 \arguments{
-  \item{xts}{A matrix, data frame etc., with each column a time series, over a common time period}
+  \item{xts}{A time series.}
   \item{lag}{Lag. A positive integer.}
+  \item{regFtnName}{Regression model to be used, currently 'lm', 'glm'
+     (\code{family=binomial}), or 'towerKNN'.}
   \item{k}{k nearest neighbors}
 }
 \details{
