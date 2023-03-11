@@ -25,15 +25,12 @@ makeTower(data,yName,regFtnName,opts,scaling=NULL,yesYVal=NULL)
      to be considered positive, i.e. for which Y will be 1.}
   \item{object}{Object of type 'tower'.}
   \item{newx}{New case(s) to be predicted, in the same format as in the
-  non-Y portion of \code{data}.}
+     non-Y portion of \code{data}.}
+  \item{...}{Other arguments need by \code{regFtnName}.}
 }
 
 \value{Object of class 'tower', to be used as input to
 \code{predict.tower}.}
-
-\details{
-
-}
 
 \author{
 Norm Matloff,
