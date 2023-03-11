@@ -9,7 +9,7 @@ be derived for predicting new cases having arbitrary NA patterns.
 }
 \usage{
 makeTower(data,yName,regFtnName,opts,scaling=NULL,yesYVal=NULL)
-\method{predict}{tower}{object,newx,k=1,...}
+\method{predict}{tower}(object,newx,k=1,...)
 }
 \arguments{
   \item{data}{Data frame or equivalent..}
