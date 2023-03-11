@@ -1,13 +1,15 @@
 \name{makeTower}
 \alias{makeTower}
+\alias{predict.tower}
 \title{Nonimputational method for dealing with NA values in prediction
 application}
 \description{In a prediction application, the intended regression model
 is applied to complete cases, from which marginal regression models can
-be derived for predicting new cases with arbitrary NA patterns.
+be derived for predicting new cases having arbitrary NA patterns.
 }
 \usage{
-makeTower(data,yName,regFtnName,scaling=NULL,yesYVal=NULL)
+makeTower(data,yName,regFtnName,opts,scaling=NULL,yesYVal=NULL)
+\method{predict}{tower}{object,newx,k=1,...}
 }
 \arguments{
   \item{data}{Data frame or equivalent..}
@@ -15,52 +17,26 @@ makeTower(data,yName,regFtnName,scaling=NULL,yesYVal=NULL)
      predicted.} 
   \item{regFtnName}{Regression model to be used, currently 'lm', 'glm'
      (\code{family=binomial}), or 'towerKNN'.}
-  \item{opts}{Options for \code{regFtnName}, a quoted string with 
-     separating commas.}
+  \item{opts}{Optional argumentss for \code{regFtnName}, an R list.} 
   \item{k}{number of nearest neighbors}
-  \item{scale}{Scaling to be applied to x and newx. Default NULL
+  \item{scaling}{Scaling to be applied to x and newx. Default NULL
      means no scaling.}
+  \item{yesYVal}{In the case of dichotomous Y, this specifies the level
+     to be considered positive, i.e. for which Y will be 1.}
+}
+
+\value{Object of class 'tower', to be used as input to
+\code{predict.tower}.}
+
+\details{
 
 }
 
-\value{vector of predicted values}
-\references{
-The intended class of applications is predictive modeling, rather than estimation. Predictive methods of any type can be used with our Tower Method, including both linear/generalized linear models and nonparametric/ML methods.
-
-Most of the MV literature, both in the statistics and machine learning realms, concerns estimation of some relationship, say estimation of regression coefficients and the like. By constrast, our emphasis here is on PREDICTION, especially relevant in our AI era. The main contribution of this package is a novel technique that we call the Tower Method, which is directly aimed at prediction. It is nonimputational. (For some other nonimputational methods, though not motivated by prediction, see for instance (Soysal, 2018) and (Gu, 2015).)
-
-To make things concrete, say we are regressing Y on a vector X of p predictors. We have data on X in a matrix A of n rows, thus of dimensions n x p. Some of the elements of A are missing, i.e. are NA values in the R language. We are definitely including the classification case here, so that Y is a vector of 0s and 1s (two-class case), or an n x k matrix of 0s and 1s (k-class case).
-
-Note carefully that in describing our methods as being for regression applications, we do NOT mean imputing missing values through some regression technique. Instead, our context is that of regression applications themselves, with the goal being prediction.
-
-See https://github.com/matloff/toweranNA for detail and latest links. 
-
-X. Gu and N. Matloff, A Different Approach to the Problem of Missing
-Data, Proceedings of the Joint Statistical Meetings, 2015
-
-M. Jones, Indicator and Stratification Methods for Missing Explanatory
-Variables in Multiple Linear Regression, JASA 1996
-
-N. Matloff, Statistical Regression and Classification: from Linear
-Models to Machine Learning, 2017, CRC Press; summarizing N. Matloff,
-Use of Regression Functions for Improved Estimation of Means,
-Biometrika, 1981
-
-O.S. Miettinen, Theoretical Epidemiology:
-Principles of Occurrence Research in Medicine, 1985
-
-U. Nur et al, Modelling relative survival in the presence of
-incomplete data: a tutorial, Int. J. Epidemiology, 2010
-
-S. Soysal et al, the Effects of Sample Size and Missing Data Rates on
-Generalizability Coefficients, Eurasian J. of Ed. Res., 2018
-
-
-}
 \author{
 Norm Matloff,
-Pete MOhanty
+Pete Mohanty
 }
+
 \examples{
 # split off new data
 newx <- mtcars[-c(1:10),-1]
@@ -83,3 +59,4 @@ pred <- toweranNA(x=mtcars[1:10,-1],
 head(pred)
 #[1] -0.3051317  2.1920280  2.0616099  2.1920280  2.0616099  2.1920280
 }
+
