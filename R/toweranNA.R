@@ -103,7 +103,7 @@ makeTower <-
    returnObj
 }
 
-predict.tower <- function(object,newx,k=1)
+predict.tower <- function(object,newx,k=1,...)
 {
    x <- object$x
    fittedReg <- object$fittedReg
