@@ -12,7 +12,6 @@ License: GPL (>= 2)
 Description: Non-imputational method for handling missing values in 
    a prediction context.
 Encoding: UTF-8
-LazyData: true
 URL: https://github.com/matloff/toweranNA
 BugReports: https://github.com/matloff/toweranNA/issues
 NeedsCompilation: no
