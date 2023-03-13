@@ -4,7 +4,12 @@
 Tower for Times Series
 }
 \description{
-fits linear model to lagged elements; k is the number of nearest neighbors; predicts only the missing; the component 'naIdxs' records the indices of the predicted elements (some will be NA)
+
+Fits a linear model or other regression method to to lagged elements,
+using the Tower approach.  Here k is the number of nearest neighbors as
+in \code{toweranNA}.  Currently predicts only the component that is just
+past the end of the data.
+
 }
 \usage{
 towerTS(xts,lag,k,regFtnName='lm')
@@ -20,8 +25,7 @@ towerTS(xts,lag,k,regFtnName='lm')
 See ?towerLM and ?regtools::TStoX
 }
 \value{
-\item{preds}{predicts only the missing; may return some missing.}
-\item{NAIdx}{Indices of the original missing.}
+Predicted value for the next item in the series.
 }
 
 \author{
@@ -37,6 +41,6 @@ w <- x
 # introduce 10 percent missingness
 x[sample(1000, 100)] <- NA
 # make predictions with lag 3 using k=4 nearest neighbors 
-out <- towerTS(x, lag=10, k=4)
+towerTS(x, lag=10, k=4)
 #  -0.1685019   
 }

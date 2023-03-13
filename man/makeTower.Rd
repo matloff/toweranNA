@@ -12,12 +12,12 @@ makeTower(data,yName,regFtnName,opts,scaling=NULL,yesYVal=NULL)
 \method{predict}{tower}(object,newx,k=1,...)
 }
 \arguments{
-  \item{data}{Data frame or equivalent..}
-  \item{yName}{Name of the column in \code{data} to be predicte to be
+  \item{data}{Data frame or equivalent.}
+  \item{yName}{Name of the column in \code{data} to be
      predicted.} 
   \item{regFtnName}{Regression model to be used, currently 'lm', 'glm'
      (\code{family=binomial}), or 'towerKNN'.}
-  \item{opts}{Optional argumentss for \code{regFtnName}, an R list.} 
+  \item{opts}{Optional arguments for \code{regFtnName}, an R list.} 
   \item{k}{number of nearest neighbors}
   \item{scaling}{Scaling to be applied to x and newx. Default NULL
      means no scaling.}
