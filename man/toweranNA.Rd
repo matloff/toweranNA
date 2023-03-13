@@ -7,7 +7,7 @@ Applications}
 
 \description{
 
-A \emph{nonimputational} method for handling missing values (MVs)
+A \emph{nonimputational} method for handling missing values (MVs),
 specifically for \emph{prediction applications.}
 
 \bold{Norm Matloff (UC Davis) and Pete Mohanty (Google)}
@@ -23,7 +23,7 @@ There are a number of powerful R packages for handling missing values
 blanks'' in MV-ridden datasets, so as to enable the user to do
 statistical inference on the completed data.
 
-These methods are typical not capable of predicting new cases that have
+These methods are typically not capable of predicting new cases that have
 MVs. With the \emph{toweranNA} package, \emph{the intended class of
 applications is predictive modeling, rather than estimation.}
 
@@ -41,7 +41,7 @@ The call forms are:
 
 \preformatted{
 
-makeTower(data, yName, regFtnName, opts, scaling = NULL,
+makeTower(data, yName, regFtnName, opts = NULL, scaling = NULL,
     yesYVal = NULL)
 predict(towerObj, newx, k = 1)
 
@@ -56,33 +56,33 @@ The main arguments are:
   \emph{yName}: Name of the column containing ``Y'', the variable to
   be predicted.
 \item
-  \emph{regFtnName}: Name of the regression model, currently `lm',
+  \code{regFtnName}: Name of the regression model, currently `lm',
   `glm' or `towerKNN'.
 \item
-  \emph{opts}: Optional arguments for \code{regFtnName}.
+  \code{opts}: Optional arguments for \code{regFtnName}.
 \item
-  \emph{towerObj}: Object of class ``tower'' returned by
-  \emph{makeTower()}.
+  \code{towerObj}: Object of class ``tower'' returned by
+  \code{makeTower()}.
 \item
-  \emph{newx}: The X data to be predicted (one or more new cases).
+  \code{newx}: The X data to be predicted (one or more new cases).
 \item
-  \emph{k}, The number of nearest neighbors.
+  \code{k}, The number of nearest neighbors use in prediction. (Not the
+  same as \code{kmax} in \code{towerKNN}.)
 }
 
 The argument \emph{k} is a tuning parameter chosen by the analyst.
 
-\bold{Example: Vocabulary
-acquisition}
+\bold{Example: Vocabulary Acquisition}
 
 This data is from the \href{http://wordbank.stanford.edu}{Stanford
 University Wordbank project}. The data, \emph{english}, is included in
 the toweranNA package. Of the non-administrative variables,
-e.g.~excluding `Language', which is always English in this data, about
+e.g. excluding `Language', which is always English in this data, about
 43 percent of the values are missing.
 
 To illustrate how fitting and prediction occur, let's apply Tower to fit
 the data and predict Y for the cases having missing values. We will take
-age and gender as predictors.a
+age and gender as predictors.
 
 \preformatted{
 data(english)
@@ -96,7 +96,7 @@ names(english)
 engl1 <- english[,c(2,5:8,10)]
 
 head(engl1)
-#  age birth_order ethnicity    sex         mom_ed vocab
+#   age birth_order ethnicity    sex         mom_ed vocab
 # 1  24       First     Asian Female       Graduate   337
 # 2  19      Second     Black Female        College   384
 # 3  24       First     Other   Male Some Secondary    76
@@ -117,13 +117,13 @@ tail(engl1)
 # 5497  28        <NA>      <NA> Female   <NA>   550
 # 5498  28        <NA>      <NA>   Male   <NA>   549
 
-#fit linear model for predictingt vocabulary size
+# fit linear model for predictingt vocabulary size
 towerOut <- makeTower(engl1,'vocab','lm')
 }
 
-Say we wish to predict a new case like the child in row 5, but who is
-second in birth order, and for whom gender and mother's education are
-missing.
+Say we wish to predict a new case like the child in row 5, but little
+order, and who is second in birth order, and for whom gender and
+mother's education are missing.
 
 \preformatted{
 newx <- engl1[5,-6]
@@ -148,13 +148,13 @@ or an R factor.
 Most of the MV literature concerns estimation of some relationship, say
 comparison of means, analysis of linear regression coefficients and the
 like. One applies some MV method to the original data, obtaining a
-``filled-in'' version of the data. (or several such versions). One then
-does one's statistical analysis on the new version.
+``filled-in'' version of the data (or several such versions). One then
+performs one's statistical analysis on the new version.
 
 By constrast, our emphasis here is on \emph{PREDICTION}, especially
 relevant in our AI era. The main contribution of this package is a
 technique that we call the Tower Method, which is \emph{directly aimed
-at prediction}. It is nonimputational, i.e.~we do not make guesses as to
+at prediction}. It is nonimputational, i.e. we do not make guesses as to
 the missing values in X.
 
 Note carefully:
@@ -174,22 +174,22 @@ Note carefully:
 
 \emph{Illustration via the vocabulary data example}
 
-Consider the above illustration, in which we wished to predict a new
-case in which gender and mother's educational level were missed. Then
+Consider the above illustration, in which we wish to predict a new
+case in which gender and mother's educational level are missed. Then
 our prediction might be the estimated value of the regression function
-of wage on age, birth order and ethnicity, i.e.~the \emph{marginal
+of wage on age, birth order and ethnicity, i.e. the \emph{marginal
 regression function} of wage on that set of variables.
 
 Since each new case to be predicted will likely have a different pattern
 of which variables are missing, we would need to estimate many
-(potentially 25 = 32) marginal regression functions. For datasets with p
-predictors, 2p of these would be needed. This would in many applications
-be computationally infeasible, as each marginal model would need to be
-fitted and run through diagnostic plots, hyperparameter investigation,
-and the like.
+(potentially 32) marginal regression functions. For datasets with p
+predictors, 2 to the power p of these would be needed.  This would in
+many applications be computationally infeasible, as each marginal model
+would need to be fitted and run through diagnostic plots, hyperparameter
+investigation, and the like.
 
 \emph{But the Tower Property provides an alternative.} It tells us
-that \emph{we can obtain the marginal regression functions from the
+that \emph{we can obtain all the marginal regression functions from the
 full one.}
 
 \bold{The Tower Property}
@@ -215,8 +215,8 @@ known, this is very useful, as we will now explain.
 \emph{How it solves our problem}
 
 In our vocabulary example above, for a new case in which age, birth
-order and ethnicity for whom gender and mother's education are missing.
-we would have
+order and ethnicity are known but for whom gender and mother's education
+are missing, we would have
 
 U  = (age, birth order, ethnicity)
 V = (gender,mom_ed)
@@ -230,12 +230,12 @@ Specifically, we fit the full model to the complete cases in the data,
 then average that model over all data points whose values for which the
 values of age, birth order and ethnicity match those in the new case to
 be predicted. \emph{Thus only the full model need be estimated, rather
-than 2p models.}
+than 2 to the power p models.}
 
 Our package \emph{toweranNA} (``tower analysis with NAs'') takes this
 approach. Usually, there may not be many data points having the exact
 value specified for U, if any, so we average over a neighborhood of
-points near that value. The argument \emph{k} specifies the number o
+points near that value. The argument \emph{k} specifies the number of
 near neighbors. Since we are averaging fitted regression estimates,
 which are by definition already smoothed, a small value of \emph{k}
 should work well.
@@ -252,6 +252,7 @@ argument \emph{yesYVal} specifying which level of the factor we wish
 to be considered the positive case.
 
 \preformatted{
+engl2 <- engl1
 engl2$vocab <- as.factor(engl2$vocab > 100)
 newx
 #   age birth_order ethnicity sex mom_ed
@@ -295,8 +296,7 @@ gold[1099:1108]
 # [1] 395.30 394.10 393.40 396.00     NA     NA 391.25 383.30 384.00 382.30
 }
 
-Currently only the next element after the end of the series is
-predicted. Let's predict the 1109th data point:
+Let's predict the 1109th data point:
 
 \preformatted{
 towerTS(gold,5,1)  # lag 5, k = 1, 'lm' etc.
@@ -346,11 +346,11 @@ Tower-ization.
 Intuition might suggest that such an approach may be less accurate in
 predicting Y, as the MI algorithms are in essence devoting the data
 resources to predicting all columns simultaneously. This would make an
-interesting avenue for research, and we will be adding Tower-ization .
+interesting avenue for research, and we will be adding Tower-ization 
 methods for \code{Amelia} etc.
 
 Also, what about regression functions and packages that do focus on
-predicting Y and do allow missing X values in the training data?\\
+predicting Y and do allow missing X values in the training data?
 Random forests packages such as \emph{randomForest} and \emph{grf}
 come to mind. But again, these tolerate MVs at the training stage but
 not in new cases.
@@ -369,16 +369,23 @@ Random (MAR) assumption. What about Tower?
 
 In our Tower Method, the assumption involves Y:
 
-E(Y | U, VNA) = E(Y | U)
+E(Y | U, V <- NA) = E(Y | U)
 
 where VNA is a boolean variable symbolizing that the variables in V are
 missing.
 
 This assumption is neither implies nor is implied by MAR, but it is
 similar to that condition. As with MAR, this assumption is not
-verifiable, and thus we must simply ask, ``Does it work?'', meaning how
-well does it predicts new cases? And \emph{that} is verifiable, via
+verifiable, but in prediction applicants, the assumption are not so
+vital.  We simply ask, ``Does it work?'', meaning how
+well does it predict new cases? And \emph{that} is verifiable, via
 cross-validation.
+
+*Reference:*
+
+Statistical Regression and Classification:
+from Linear Models to Machine Learning,
+N. Matloff, Chapman and Hall, 2017. 
 
 }
 
