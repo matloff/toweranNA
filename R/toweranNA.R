@@ -28,7 +28,7 @@
 # matter which regression model is used
 
 makeTower <- 
-   function(data,yName,regFtnName,opts,scaling=NULL,yesYVal=NULL) 
+   function(data,yName,regFtnName,opts=NULL,scaling=NULL,yesYVal=NULL) 
 {
    yCol <- which(names(data) == yName)
    x <- data[,-yCol]
