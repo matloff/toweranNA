@@ -131,8 +131,8 @@ newx$age <- 28
 newx$sex <- NA
 newx$mom_ed <- NA
 newx
-  age birth_order ethnicity sex mom_ed
-5  28       First     White  NA     NA
+#   age birth_order ethnicity sex mom_ed
+# 5  28       First     White  NA     NA
 predict(towerOut,newx)
 # 496.9752
 }
