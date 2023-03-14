@@ -234,9 +234,7 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
         x <- as.matrix(x)
     ccout <- regtools::constCols(x)
     if (length(ccout) > 0) {
-        warning("X data has constant columns:")
-        print(ccout)
-        print("deleting")
+        warning("constant columns deleted:")
         x <- x[, -ccout]
     }
     else ccout <- NULL

@@ -1,16 +1,19 @@
 Package: toweranNA
 Title: A Method for Handling Missing Values in Prediction Applications
 Version: 0.1.0
-Authors@R: c(person("Norm", "Matloff", email = "nsmatloff@ucdavis.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")),
-           person("Pete", "Mohanty", email = "pete.mohanty@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0001-8531-3345")))
+Authors@R: c(person("Norm", "Matloff", email = "nsmatloff@ucdavis.edu", 
+           role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")),
+           person("Pete", "Mohanty", email = "pete.mohanty@gmail.com", 
+           role = c("aut"), comment = c(ORCID = "0000-0001-8531-3345")))
 Maintainer: Norm Matloff <nsmatloff@ucdavis.edu>
 Depends: R (>= 3.6.0),regtools (>= 0.8.0),rmarkdown
-Suggests: knitr
-VignetteBuilder: knitr
 Imports: FNN, pdist, stats
 License: GPL (>= 2)
 Description: Non-imputational method for handling missing values in 
-   a prediction context.
+   a prediction context, meaning that not only are there missing
+   values in the training dataset, but also some values may be missing
+   in future cases to be predicted. Based on the notion of regression
+   averaging (Matloff (2017,ISBN 9781498710916)).
 Encoding: UTF-8
 URL: https://github.com/matloff/toweranNA
 BugReports: https://github.com/matloff/toweranNA/issues
