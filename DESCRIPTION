@@ -1,6 +1,6 @@
 Package: toweranNA
 Title: A Method for Handling Missing Values in Prediction Applications
-Version: 0.1.0
+Version: 1.0
 Authors@R: c(person("Norm", "Matloff", email = "nsmatloff@ucdavis.edu", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9179-6785")),
            person("Pete", "Mohanty", email = "pete.mohanty@gmail.com", 

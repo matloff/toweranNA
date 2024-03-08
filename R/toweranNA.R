@@ -9,7 +9,7 @@
 #    variables
 
 #    yName: name of the column in 'data' for "Y"; the other columns form
-#    "X"; if "Y" is dichotomous or categorical
+#    "X"; if "Y" is dichotomous or categorical, it must be an R factor
 
 #    regFtnName: current choices are 'lm','glm' (with family=binomial),
 #       and towerKNN (modified from regtools package)
@@ -24,21 +24,16 @@
 # value: object of class 'tower', for which the predict() method
 # predict.tower() is available
 
-# note that the predict() function will later need NA-free data, no
-# matter which regression model is used
-
 makeTower <- 
    function(data,yName,regFtnName,opts=NULL,scaling=NULL,yesYVal=NULL) 
 {
    yCol <- which(names(data) == yName)
-   x <- data[,-yCol]
+   x <- data[,-yCol,drop=FALSE]
    y <- data[,yCol]
    if (is.null(y)) stop('check spelling of yName')
    classif <- is.factor(y)
    multiclass <- classif && length(levels(y)) > 2
 
-   # get complete cases
-   origX <- x
    # ccs <- which(complete.cases(x))
    ccs <- which(complete.cases(data))
    x <- x[ccs,]
@@ -126,7 +121,6 @@ predict.tower <- function(object,newx,k=1,...)
    if (sumAllNA > 0)  {
       stop("drop newx rows that are all NA")
    }
-
 
    # set up space for the predictions
    if (!multiclass) {
