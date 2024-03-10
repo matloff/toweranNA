@@ -137,7 +137,12 @@ predict.tower <- function(object,newx,k=1,...)
       rwm <- as.matrix(rw)
       rwm <- matrix(rwm,nrow=1)
       if (!is.null(scaling)) {
-         rwm <- scale(rwm,center=scaling$center,scale=scaling$scale)
+         # rwm <- scale(rwm,center=scaling$center,scale=scaling$scale)
+         # the 'scaling' entity we have available is for the full
+         # predictor set; we need it for 'ic'
+         ctr <- scaling[[1]][ic]
+         scl <- scaling[[2]][ic]
+         rwm <- scale(rwm,center=ctr,scale=scl)
       }
 
       # find neighbors; nni will be the index/indices in x of the near
