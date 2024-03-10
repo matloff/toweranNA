@@ -28,30 +28,26 @@ makeTower <-
    function(data,yName,regFtnName,opts=NULL,scaling=NULL,yesYVal=NULL) 
 {
    yCol <- which(names(data) == yName)
-   x <- data[,-yCol,drop=FALSE]
-   y <- data[,yCol]
+   ### x <- data[,-yCol,drop=FALSE]
+   ### y <- data[,yCol]
+   ccs <- which(complete.cases(data))
+   x <- data[ccs,-yCol,drop=FALSE]
+   y <- data[ccs,yCol]
    if (is.null(y)) stop('check spelling of yName')
    classif <- is.factor(y)
    multiclass <- classif && length(levels(y)) > 2
 
-   # ccs <- which(complete.cases(x))
-   ccs <- which(complete.cases(data))
-   x <- x[ccs,]
-   y <- y[ccs]
-
    # convert any "X" factors
    factors <- sapply(x,is.factor)  
-   saveXfactorInfo <- NULL
    if (any(factors)) {
       x <- regtools::factorsToDummies(x,omitLast=TRUE)
       saveXfactorInfo <- attr(x,'factorsInfo')
-   }
+   } else saveXfactorInfo <- NULL
 
    if (!is.null(scaling)) {
       x <- scale(x)
       scaling <- list(center=attr(x,'scaled:center'),
                       scale=attr(x,'scaled:scale'))
-
    }
 
    # and for "Y" as well
@@ -65,7 +61,7 @@ makeTower <-
          y <- regtools::factorsToDummies(y,omitLast=FALSE)
          saveYfactorInfo <- attr(y,'factorsInfo')$dfr$fullLvls
       }
-   }
+   } else saveYfactorInfo <- NULL
 
    # fit the regression model
    if (multiclass && regFtnName != 'towerKNN')
@@ -100,7 +96,7 @@ makeTower <-
 
 predict.tower <- function(object,newx,k=1,...)
 {
-   x <- object$x
+   x <- object$x  # X in training data
    fittedReg <- object$fittedReg
    multiclass <- object$multiclass
    scaling <- object$scaling
