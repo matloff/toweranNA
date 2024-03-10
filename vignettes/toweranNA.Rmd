@@ -24,9 +24,9 @@ specifically for *prediction applications*.
 Reading through the first example ("Vocabulary Acquisition") is
 sufficient for a quick start.
 
-This is a followed by a methodological explanation of how the package
-works, then a followup to the vocabulary example, and a second example
-in the time series realm.
+This is a followed by further examples, and 
+a methodological explanation of how the package
+works. 
 
 # Overview: the Goal Is Prediction, Not Statistical Inference
 
@@ -139,7 +139,71 @@ predict(towerOut,newx)
 # 496.9752
 ```
 
-# toweranNA: A Method Based on Regression Averaging
+# Classification Applications
+
+Say we wish to predict whether the child has a vocabulary of more than
+100 words. Dichotomous Y in the package must be an R factor, with the
+argument **yesYVal** specifying which level of the factor we wish
+to be considered the positive case.
+
+``` r
+engl2 <- engl1
+engl2$vocab <- as.factor(engl2$vocab > 100)
+newx
+#   age birth_order ethnicity sex mom_ed
+# 5  24      Second     White  NA     NA
+towerOut <- makeTower(engl2,'vocab','glm',yesYVal='TRUE')
+predict(towerOut,newx)
+# 0.9833677 98% chance that this new child knows more than 100 words
+}
+```
+
+Let's try predicting birth order.
+
+
+``` r
+newx <- engl1[5,-2]
+newx$age <- 28
+newx$mom_ed <- NA
+newx
+#   age ethnicity    sex mom_ed vocab
+# 5  28     White Female     NA   480
+towerOut <- makeTower(engl1,'birth_order','towerKNN',opts=list(kmax=25))
+predict(towerOut,newx,10)
+#     Eighth Fifth First Fourth Second Seventh Sixth Third
+#          0 0.004 0.568      0   0.34       0     0 0.088
+```
+
+# Example: Gold time series
+
+One can handle missing values in a time series, by converting to a data
+frame, then applyng Tower.
+
+Rob Hyndman's **forecast** package includes a time series
+**gold**, consisting of 1108 daily gold prices. The series does
+have some NAs, including two in the final 10 data points:
+
+``` r
+data(gold,package='forecast')
+gold[1099:1108]
+# [1] 395.30 394.10 393.40 396.00     NA     NA 391.25 383.30 384.00 382.30
+```
+
+Let's predict the 1109th data point:
+
+``` r
+towerTS(gold,5,1)  # lag 5, k = 1, 'lm' etc.
+# 385.2088
+```
+
+Internallly, the function **regtools::TStoX()** transforms the data to
+an 6-column matrix, designed for analyses of lag 5. Column 6 then
+becomes Y, with columns 1:5 being X. In any given row of the matrix, the
+first 5 values are the most recent ones preceding the Y value.  So, the
+call to **lm()** is loosely autoregressive, with each time point
+predicted from the previous 5.
+
+# toweranNA: a Method Based on Regression Averaging
 
 *Setting:* We have a dataset in which one of the columns, Y, is to
 be predicted in the future. The remaining columns, collectively referred
@@ -217,8 +281,10 @@ In our vocabulary example above, for a new case in which age, birth
 order and ethnicity are known but for whom gender and mother's education
 are missing, we would have
 
-U  = (age, birth order, ethnicity)
+``` r
+U  = (age, birth order, ethnicity),
 V = (gender,mom_ed)
+```
 
 E(Y|U) is the target marginal regression function that we wish
 to estimate and then use to predict the new case in hand. The Tower
@@ -231,7 +297,7 @@ values of age, birth order and ethnicity match those in the new case to
 be predicted. *Thus only the full model need be estimated, rather
 than 2 to the power p models.*
 
-Our package *toweranNA* (``tower analysis with NAs'') takes this
+Our package **toweranNA** (``tower analysis with NAs'') takes this
 approach. Usually, there may not be many data points having the exact
 value specified for U, if any, so we average over a neighborhood of
 points near that value. The argument **k** specifies the number of
@@ -245,113 +311,6 @@ Moreover, an early *Biometrika* paper by one of us (summarized in
 (Matloff, 2017, Sec. 7.5)) proved that regression averaging improves
 estimation of means in the case of parametric models, even with no MVs,
 thus an added bonus.
-
-# Classification Applications
-
-Say we wish to predict whether the child has a vocabulary of more than
-100 words. Dichotomous Y in the package must be an R factor, with the
-argument **yesYVal** specifying which level of the factor we wish
-to be considered the positive case.
-
-``` r
-engl2 <- engl1
-engl2$vocab <- as.factor(engl2$vocab > 100)
-newx
-#   age birth_order ethnicity sex mom_ed
-# 5  24      Second     White  NA     NA
-towerOut <- makeTower(engl2,'vocab','glm',yesYVal='TRUE')
-predict(towerOut,newx)
-# 0.9833677 98% chance that this new child knows more than 100 words
-}
-
-Let's try predicting birth order.
-
-
-``` r
-newx <- engl1[5,-2]
-newx$age <- 28
-newx$mom_ed <- NA
-newx
-#   age ethnicity    sex mom_ed vocab
-# 5  28     White Female     NA   480
-towerOut <- makeTower(engl1,'birth_order','towerKNN',opts=list(kmax=25))
-predict(towerOut,newx,10)
-#     Eighth Fifth First Fourth Second Seventh Sixth Third
-#          0 0.004 0.568      0   0.34       0     0 0.088
-```
-
-# Application to Time Series
-
-One can handle missing values in a time series, by converting to a data
-frame, then applyng Tower.
-
-# Example: Gold time series
-
-Rob Hyndman's **forecast** package includes a time series
-**gold**, consisting of 1108 daily gold prices. The series does
-have some NAs, including two in the final 10 data points:
-
-``` r
-data(gold,package='forecast')
-gold[1099:1108]
-# [1] 395.30 394.10 393.40 396.00     NA     NA 391.25 383.30 384.00 382.30
-```
-
-Let's predict the 1109th data point:
-
-``` r
-towerTS(gold,5,1)  # lag 5, k = 1, 'lm' etc.
-# 385.2088
-```
-
-Internallly, the function **regtools::TStoX()** transforms the data
-to an 6-column matrix, designed for analysis of lag 5. Column 6 then
-becomes Y, with columns 1:5 being X. So, the call to **lm()** is
-loosely autoregressive, with each time point predicted from the previous
-5.
-
-# Could Other MV Packages Do Prediction?
-
-Could a **predict()** method be added to packages like
-**Amelia** and **mice**?
-
-The answer on one level is no. The multiple imputation (MI) algorithms
-they use are designed solely to ``fill in the blanks'' in the training
-data. There is nothing in the algorithms on dealing with MVs in new
-cases.
-
-On the other hand, some remedies are possible:
-
-*
-  Each time we are presented with a new case having MVs, we could add it
-  to the original training data, with Y also treated as an MV. We could
-  then rerun the MI algorithm, and the filled-in spot for the new Y
-  would be our predicted value. (With multiple imputations, we could,
-  say, take the mean of the filled-in Ys. Of course, this would have the
-  drawback of entailing large increases in computation.
-*
-  Each time we are presented with a new case having MVs, we could find
-  the nearest filled-in row in the training set, and take its Y value as
-  our prediction for the new case. (Or look at k near neighbors and
-  average their Ys.) As we do here with Tower, distances would be
-  calculated on the basis of the intact values in the new case.
-
-Thus **Amelia**, **mice** etc. could be ``Tower-ized''. They
-would not have the central focus on Y that Tower has, but reasonable
-**predict()** methods could be developed for them via
-Tower-ization.
-
-Intuition might suggest that such an approach may be less accurate in
-predicting Y, as the MI algorithms are in essence devoting the data
-resources to predicting all columns simultaneously. This would make an
-interesting avenue for research, and we will be adding Tower-ization 
-methods for **Amelia** etc.
-
-Also, what about regression functions and packages that do focus on
-predicting Y and do allow missing X values in the training data?
-Random forests packages such as **randomForest** and **grf**
-come to mind. But again, these tolerate MVs at the training stage but
-not in new cases.
 
 # Assumptions
 
@@ -367,10 +326,7 @@ Random (MAR) assumption. What about Tower?
 
 In our Tower Method, the assumption involves Y:
 
-E(Y | U, V <- NA) = E(Y | U)
-
-where VNA is a boolean variable symbolizing that the variables in V are
-missing.
+E(Y | U, V missing) = E(Y | U, V intact)
 
 This assumption is neither implies nor is implied by MAR, but it is
 similar to that condition. As with MAR, this assumption is not
