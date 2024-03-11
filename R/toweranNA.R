@@ -17,7 +17,8 @@
 #    opts: R list, specifying optional arguments of regFtnName, and
 #       their values; currently applies to towerKNN
 
-#    scaling: if not NULL, scaling will be done on "X", using 'scale' 
+#    scaling: if not NULL, scaling will be done on "X", using 'scale'
+#    (will add [0,1] scaliing in the future)
 
 #    yesYVal: in dichotomous case, which value should be coded as 1
 
@@ -28,11 +29,13 @@ makeTower <-
    function(data,yName,regFtnName,opts=NULL,scaling=NULL,yesYVal=NULL) 
 {
    yCol <- which(names(data) == yName)
-   ### x <- data[,-yCol,drop=FALSE]
-   ### y <- data[,yCol]
-   ccs <- which(complete.cases(data))
-   x <- data[ccs,-yCol,drop=FALSE]
-   y <- data[ccs,yCol]
+   whoIsMissing <- is.na(data)
+   rownames(whoIsMissing) <- 1:nrow(data)
+   # ccs <- which(complete.cases(data))
+   completeRows <- which(apply(whoIsMissing,1,sum) == 0)
+   incompleteRows <- setdiff(1:nrow(data),completeRows)
+   x <- data[completeRows,-yCol,drop=FALSE]
+   y <- data[completeRows,yCol]
    if (is.null(y)) stop('check spelling of yName')
    classif <- is.factor(y)
    multiclass <- classif && length(levels(y)) > 2
@@ -66,7 +69,7 @@ makeTower <-
    # fit the regression model
    if (multiclass && regFtnName != 'towerKNN')
       stop('only towerKNN set up for multiclass case for now')
-   dataccs <- data[ccs,]
+   dataccs <- data[completeRows,]
    if (regFtnName == 'lm') {
       ftnCall <- sprintf('lm(%s ~ .,dataccs)',yName)
       tmp <- evalr(ftnCall)
@@ -87,9 +90,24 @@ makeTower <-
    } else stop('invalid regression model')
 
    # package it and done
-   returnObj <- list(regFtnName=regFtnName,x=x,fittedReg=fittedReg,
-      classif=classif,multiclass=multiclass,saveXfactorInfo=saveXfactorInfo,
-      saveYfactorInfo=saveYfactorInfo,scaling=scaling)
+
+   # data with at least 1 NA 
+   xcomp <- data[incompleteRows,-yCol,drop=FALSE]
+
+   returnObj <- 
+      list(regFtnName=regFtnName,
+           x=x,
+           fullData=data,
+           whoIsMissing=whoIsMissing,
+           completeRows=completeRows,
+           incompleteRows=incompleteRows,
+           yCol=yCol,
+           fittedReg=fittedReg,
+           classif=classif,
+           multiclass=multiclass,
+           saveXfactorInfo=saveXfactorInfo,
+           saveYfactorInfo=saveYfactorInfo,
+           scaling=scaling)
    class(returnObj) <- 'tower'
    returnObj
 }
@@ -137,7 +155,6 @@ predict.tower <- function(object,newx,k=1,...)
       rwm <- as.matrix(rw)
       rwm <- matrix(rwm,nrow=1)
       if (!is.null(scaling)) {
-         # rwm <- scale(rwm,center=scaling$center,scale=scaling$scale)
          # the 'scaling' entity we have available is for the full
          # predictor set; we need it for 'ic'
          ctr <- scaling[[1]][ic]
@@ -145,8 +162,8 @@ predict.tower <- function(object,newx,k=1,...)
          rwm <- scale(rwm,center=ctr,scale=scl)
       }
 
-      # find neighbors; nni will be the index/indices in x of the near
-      # neigbors
+      # find neighbors of x; nni will be the index/indices in x of the near
+      # neighbors
       nni <- nearNeighborIndices(rwm,x,ic,k)
 
       if (!multiclass) {
@@ -160,8 +177,11 @@ predict.tower <- function(object,newx,k=1,...)
    preds
 }
 
+# find indices of k near neighbors of the rows of rwm in x[,ic]
+
 nearNeighborIndices <- function(rwm,x,ic,k) 
 {
+   if (ncol(rwm) != ncol(x[,ic])) stop("rwm,x[,ic] cols don't match")
    if (k == 1) {
        tmp <- pdist(rwm[1,],x[,ic])@dist
        nni <- which.min(tmp)
@@ -320,9 +340,27 @@ towerKNN <- function (x, y, newx = x, kmax, scaleX = TRUE, PCAcomps = 0,
     tmplist
 }
 
+####################  checkNApattern ###################################
+
+# Tower assumes E(Y | V; U missing) and E(Y | V; U intact) have the same
+# expectation; this function assesses tha
+
+# U and V are scalars, with names in u and v
+
+checkNApattern <- function(towerObject,u,v)
+{
+
+   whomiss <- towerObject$whoIsMissing
+   UgoneVthere <- which(whomiss[,u] & !whomiss[,v])
+   UthereVthere <- which(!whomiss[,u] & !whomiss[,v])
+   yCol <- towerObject$yCol
+   mean(towerObject$fullData[UgoneVthere,yCol])
+   
+}
+
 # utilities
 
-############################  evalr  ################################
+#############################  evalr  ##################################
 
 # execute the given R expression; toexec is a string
 evalr <- function(toexec) {
