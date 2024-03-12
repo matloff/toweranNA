@@ -1,10 +1,10 @@
 
 ---
-title: "Quick Start"
+title: "Quick_Start"
 output:
    rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Quick Start}
+  %\VignetteIndexEntry{Quick_Start}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
